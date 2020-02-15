@@ -1,13 +1,9 @@
-using System;
-
 namespace Flounder
 {
 
-  class Rectangle:Shape
+  public struct Rectangle : IShape
   {
-
-    static void Main(string[] args) { Console.WriteLine("Hello World!"); }
-
+    
   }
 
 }
