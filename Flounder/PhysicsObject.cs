@@ -9,9 +9,9 @@ namespace Flounder
         private int x;
         private int y;
         private int mass;
-        private Shape shape;
+        private IShape shape;
         
-        public PhysicsObject(string id, int x, int y, int mass, Shape shape){
+        public PhysicsObject(string id, int x, int y, int mass, IShape shape){
             this.id = id;
             this.x = x;
             this.y = y;

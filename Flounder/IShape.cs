@@ -3,7 +3,7 @@ using System;
 namespace Flounder
 {
 
-  interface IShape
+  public interface IShape
   {
 
   }
