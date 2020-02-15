@@ -3,10 +3,8 @@ using System;
 namespace Flounder
 {
 
-  class Circle:Shape
+  struct Circle : IShape
   {
-
-    static void Main(string[] args) { Console.WriteLine("Hello World!"); }
 
   }
 
