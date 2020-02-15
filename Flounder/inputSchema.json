@@ -17,8 +17,8 @@
             "y": "",
             "shape":{
                 "type": "rectangle",
-                "semi-width": "",
-                "semi-height": ""
+                "semiWidth": "",
+                "semiHeight": ""
             }
         }
     ]
