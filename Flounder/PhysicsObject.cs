@@ -1,8 +1,10 @@
 using System;
 
-namespace Flounder{
+namespace Flounder
+{
 
-    class PhysicsObject{
+    class PhysicsObject
+    {
         
     }
 
