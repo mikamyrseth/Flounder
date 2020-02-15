@@ -3,7 +3,7 @@ using System;
 namespace Flounder
 {
 
-    class PhysicsObject
+    public class PhysicsObject
     {
         private string id;
         private int x;
