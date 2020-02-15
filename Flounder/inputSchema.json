@@ -1,8 +1,10 @@
 {
-    "PhysicsObjects": [{
-        "id": "",
-        "mass": "",
-        "x": "",
-        "y": ""
-    }]
+    "PhysicsObjects": [
+        {
+            "id": "",
+            "mass": "",
+            "x": "",
+            "y": ""
+        }
+    ]
 }
