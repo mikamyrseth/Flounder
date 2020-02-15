@@ -4,7 +4,22 @@
             "id": "",
             "mass": "",
             "x": "",
-            "y": ""
+            "y": "",
+            "shape":{
+                "type": "circle",
+                "radius": ""
+            }
+        },
+        {
+            "id": "",
+            "mass": "",
+            "x": "",
+            "y": "",
+            "shape":{
+                "type": "rectangle",
+                "width": "",
+                "height": ""
+            }
         }
     ]
 }
