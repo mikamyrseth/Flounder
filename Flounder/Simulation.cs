@@ -4,10 +4,10 @@ namespace Flounder
 {
     public class Simulation
     {
-        private List<Body> _physicsObjects;
+        private List<Body> _bodies;
 
-        public Simulation(List<Body> physicsObjects) {
-            this._physicsObjects = physicsObjects;
+        public Simulation(List<Body> bodies) {
+            this._bodies = bodies;
         }
 
     }
