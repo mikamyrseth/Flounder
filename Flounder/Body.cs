@@ -3,21 +3,28 @@ using System;
 namespace Flounder
 {
 
-    public class Body
+    public struct Body
     {
         private string id;
-        private int x;
-        private int y;
         private int mass;
         private IShape shape;
+        private Vector2 position;
+        private Vector2 velocity;
+        private Vector2 acceleration;
         
-        public Body(string id, int x, int y, int mass, IShape shape){
+        public Body(string id,  int mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
             this.id = id;
-            this.x = x;
-            this.y = y;
             this.mass = mass;
             this.shape = shape;
+            this.position = position;
+            this.velocity = velocity;
+            this.acceleration = acceleration;
         }
+        public Body(string id,  int mass, IShape shape, Vector2 position) :
+            this(id, mass, shape, position, new Vector2(0, 0)) { }
+
+        public Body(string id, int mass, IShape shape, Vector2 position, Vector2 velocity) :
+            this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
     }
 
 }
