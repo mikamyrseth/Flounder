@@ -1,40 +1,38 @@
-﻿using System.Numerics;
-
-namespace Flounder
+﻿namespace Flounder
 {
     public struct Vector2
     {
 
         public static Vector2 operator +(Vector2 a, Vector2 b) {
-            return new Vector2(a.x + b.x, a.y + b.y);
+            return new Vector2(a._x + b._x, a._y + b._y);
         }
         
         public static Vector2 operator -(Vector2 a, Vector2 b) {
-            return new Vector2(a.x - b.x, a.y - b.y);
+            return new Vector2(a._x - b._x, a._y - b._y);
         }
 
         public static Vector2 operator *(float s, Vector2 a) {
-            return new Vector2(s * a.x, s * a.y);
+            return new Vector2(s * a._x, s * a._y);
         }
 
         public static float operator *(Vector2 a, Vector2 b) {
-            return a.x * b.x + a.y * b.y;
+            return a._x * b._x + a._y * b._y;
         }
 
         public static Vector2 operator /(Vector2 a, float s) {
-            return new Vector2(a.x / s, a.y / s);
+            return new Vector2(a._x / s, a._y / s);
         }
 
-        private float x;
-        private float y;
+        private float _x;
+        private float _y;
+
+        public float SquareLength { get { return this * this; } }
+        public float X { get { return this._x; } }
+        public float Y { get { return this._y; } }
 
         public Vector2(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public float norm2() {
-            return this.x * this.x + this.y * this.y;
+            this._x = x;
+            this._y = y;
         }
     }
 }
