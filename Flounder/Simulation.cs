@@ -12,6 +12,15 @@ namespace Flounder
             this._bodies = bodies;
         }
 
+        public void Start(int ticks) {
+            for (int i = 0; i < ticks; i++) {
+                this.Tick();
+            }
+        }
+        private void Tick() {
+            
+        }
+
     }
     
 }
