@@ -26,7 +26,7 @@ namespace Flounder
             try {
                 var jsonObject = JObject.Parse(jsonString);
                 Simulation simulation = JsonConvert.DeserializeObject<Simulation>(jsonString);
-                Debug.WriteLine(simulation);
+                Debug.WriteLine("created simulation " + simulation);
             }
             catch (JsonReaderException exception){
                 Debug.WriteLine(exception);
