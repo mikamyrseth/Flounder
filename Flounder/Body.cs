@@ -1,4 +1,6 @@
 using System;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Flounder
 {
@@ -13,6 +15,10 @@ namespace Flounder
         private Vector2 _acceleration;
         
         public Body(string id,  int mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
+            if (shape == null) {
+                throw new System.ArgumentException("Shape cannot be null");
+            }
+            Debug.WriteLine(shape.ToString());
             this._id = id;
             this._mass = mass;
             this._shape = shape;
@@ -21,8 +27,29 @@ namespace Flounder
             this._acceleration = acceleration;
         }
 
+        [JsonConstructor]
+        public Body(
+                string id, 
+                int positionX, 
+                int positionY, 
+                int mass, 
+                IShape shape, 
+                int accelerationX, 
+                int accelerationY, 
+                int velocityX,
+                int velocityY
+        ):
+            this(
+                id, 
+                mass, 
+                shape, 
+                new Vector2(positionX, positionY), 
+                new Vector2(velocityX, velocityY),
+                new Vector2(accelerationX, accelerationY)
+            ) { } 
+ 
         public override string ToString(){
-            return ("Cool object!" + this._shape);
+            return ("Cool object of type " + _shape.ToString());
         }
 
         public Body(string id,  int mass, IShape shape, Vector2 position) :

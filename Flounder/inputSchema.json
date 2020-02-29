@@ -3,38 +3,31 @@
         {
             "id": "1",
             "mass": "1",
-            "x": "1",
-            "y": "1",
+            "positionX": "1",
+            "positionY": "1",
             "shape":{
-                "circle": {
-                    "radius": "1"
-                }
-            }
+                "$type": "Flounder.Circle, Flounder",
+                "radius": "5"
+            },
+            "accelerationX": "1",
+            "accelerationY": "1",
+            "velocityX": "1",
+            "velocityY": "1"
         },
         {
             "id": "1",
             "mass": "1",
-            "x": "1",
-            "y": "1",
+            "positionX": "1",
+            "positionY": "1",
             "shape":{
-                "rectangle":{
-                    "semiWidth": "1",
-                    "semiHeight": "1"
-                }
-            }
+                "$type": "Flounder.Rectangle, Flounder",
+                "semiWidth": "1",
+                "semiHeight": "1"
+            },
+            "accelerationX": "1",
+            "accelerationY": "1",
+            "velocityX": "1",
+            "velocityY": "1"
         }
-    ],
-    "forces": [
-        {
-            "id": "1",
-            "x": "1",
-            "y": "1",
-            "bodies": [
-                "1", "2"
-            ]
-        }
-        
     ]
-    
-    
 }
