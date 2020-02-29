@@ -15,7 +15,7 @@ namespace Flounder
         public override string ToString(){
             string retrunString = "Simulation with ";
             foreach (var body in this._bodies){
-                retrunString+=body.ToString();
+                retrunString+=body.ToString() + ", ";
             }
             return retrunString;
         }

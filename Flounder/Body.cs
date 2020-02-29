@@ -49,7 +49,7 @@ namespace Flounder
             ) { } 
  
         public override string ToString(){
-            return ("Cool object! of type: " + _shape.ToString());
+            return ("Cool object of type " + _shape.ToString());
         }
 
         public Body(string id,  int mass, IShape shape, Vector2 position) :
