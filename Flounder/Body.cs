@@ -3,26 +3,32 @@ using System;
 namespace Flounder
 {
 
-    public class Body
+    public struct Body
     {
-        private string id;
-        private int x;
-        private int y;
-        private int mass;
-        private IShape shape;
+        private string _id;
+        private int _mass;
+        private IShape _shape;
+        private Vector2 _position;
+        private Vector2 _velocity;
+        private Vector2 _acceleration;
         
-        public Body(string id, int x, int y, int mass, IShape shape){
-            this.id = id;
-            this.x = x;
-            this.y = y;
-            this.mass = mass;
-            this.shape = shape;
+        public Body(string id,  int mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
+            this._id = id;
+            this._mass = mass;
+            this._shape = shape;
+            this._position = position;
+            this._velocity = velocity;
+            this._acceleration = acceleration;
         }
 
         public override string ToString(){
-            return ("Cool object!" + this.shape);
+            return ("Cool object!" + this._shape);
         }
 
+        public Body(string id,  int mass, IShape shape, Vector2 position) :
+            this(id, mass, shape, position, new Vector2(0, 0)) { }
+        public Body(string id, int mass, IShape shape, Vector2 position, Vector2 velocity) :
+            this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
     }
 
 }
