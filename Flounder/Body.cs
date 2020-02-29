@@ -18,6 +18,11 @@ namespace Flounder
             this.mass = mass;
             this.shape = shape;
         }
+
+        public override string ToString(){
+            return ("Cool object!" + this.shape);
+        }
+
     }
 
 }

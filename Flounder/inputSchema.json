@@ -1,24 +1,26 @@
 {
     "bodies": [
         {
-            "id": "",
-            "mass": "",
-            "x": "",
-            "y": "",
+            "id": "1",
+            "mass": "1",
+            "x": "1",
+            "y": "1",
             "shape":{
-                "type": "circle",
-                "radius": ""
+                "circle": {
+                    "radius": "1"
+                }
             }
         },
         {
-            "id": "",
-            "mass": "",
-            "x": "",
-            "y": "",
+            "id": "1",
+            "mass": "1",
+            "x": "1",
+            "y": "1",
             "shape":{
-                "type": "rectangle",
-                "semiWidth": "",
-                "semiHeight": ""
+                "rectangle":{
+                    "semiWidth": "1",
+                    "semiHeight": "1"
+                }
             }
         }
     ]
