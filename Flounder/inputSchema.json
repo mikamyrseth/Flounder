@@ -6,7 +6,7 @@
             "positionX": "1",
             "positionY": "1",
             "shape":{
-                "$type": "Flounder.Types.Circle, Flounder",
+                "$type": "Flounder.Circle, Flounder",
                 "radius": "5"
             },
             "accelerationX": "1",
@@ -20,7 +20,7 @@
             "positionX": "1",
             "positionY": "1",
             "shape":{
-                "$type": "Flounder.Types.Rectangle, Flounder",
+                "$type": "Flounder.Rectangle, Flounder",
                 "semiWidth": "1",
                 "semiHeight": "1"
             },

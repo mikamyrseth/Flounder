@@ -23,9 +23,11 @@ namespace Flounder
         }
         
         public static Simulation ParseInput(string jsonString){
+            var settings = new JsonSerializerSettings(){TypeNameHandling = TypeNameHandling.Auto};
+            
             try {
                 var jsonObject = JObject.Parse(jsonString);
-                Simulation simulation = JsonConvert.DeserializeObject<Simulation>(jsonString);
+                Simulation simulation = JsonConvert.DeserializeObject<Simulation>(jsonString, settings);
                 Debug.WriteLine("created simulation " + simulation);
             }
             catch (JsonReaderException exception){
