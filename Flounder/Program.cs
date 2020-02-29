@@ -6,7 +6,10 @@ namespace Flounder
   class Program
   {
 
-    static void Main(string[] args) { Console.WriteLine("Hello World!"); }
+    static void Main(string[] args) { 
+      Console.WriteLine("Hello World!"); 
+      InputParser.ParseInput(InputParser.FileToJson("inputSchema.json"));
+    }
 
   }
 
