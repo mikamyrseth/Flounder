@@ -13,11 +13,11 @@ namespace Flounder
         }
 
         public override string ToString(){
-            string retrunString = "Simulation with ";
-            foreach (var body in this._bodies){
-                retrunString+=body.ToString() + ", ";
+            string returnString = "Simulation with ";
+            foreach (Body body in this._bodies){
+                returnString+=body.ToString() + ", ";
             }
-            return retrunString;
+            return returnString;
         }
 
         public void Start(int ticks) {

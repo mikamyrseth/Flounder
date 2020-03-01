@@ -1,16 +1,33 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Flounder
 {
-    public struct ConstantForce
+    public class ConstantForce
     {
+        private string _id;
         private Vector2 _force;
-        private List<Body> _bodies;
 
-        public ConstantForce(Vector2 force, List<Body> bodies) {
+        public ConstantForce(string id, Vector2 force) {
+            this._id = id;
             this._force = force;
-            this._bodies = bodies;
         }
 
+
+        [JsonConstructor]
+        public ConstantForce(
+                string id,
+                int forceX,
+                int forceY,
+                List<string> bodies
+        ):
+            this(
+                id,
+                new Vector2(forceX, forceY)
+            ) { } 
+
+        public override string ToString (){
+          return "cool force";
+      }
     }
 }
