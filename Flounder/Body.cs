@@ -15,6 +15,14 @@ namespace Flounder
         private Vector2 _velocity;
         private Vector2 _acceleration;
         private List<ConstantForce> _forces;
+
+        ///Updates velocity and acceleration based on forces.!-- 
+        public void Tick(double deltaTime){
+            _acceleration = 
+            foreach(ConstantForce force in this._forces){
+                _acceleration += force.getVector()/((float)_mass);
+            }
+        }
         
         public Body(string id,  int mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
             if (shape == null) {
