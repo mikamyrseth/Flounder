@@ -15,7 +15,7 @@
             "velocityY": "1"
         },
         {
-            "id": "1",
+            "id": "2",
             "mass": "1",
             "positionX": "1",
             "positionY": "1",
@@ -32,13 +32,12 @@
     ],
     "forces": [
         {
-            "id": "1",
-            "x": "1",
-            "y": "1",
+            "id": "3",
+            "forceX": "1",
+            "forceY": "1",
             "bodies": [
                 "1", "2"
             ]
         }
-        
     ]
 }
