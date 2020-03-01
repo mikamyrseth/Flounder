@@ -1,20 +1,30 @@
+using System;
+using System.Linq;
+
 namespace Flounder
 {
 
   public struct Rectangle : IShape
   {
-      private int semiHeight;
-      private int semiWidth;
 
-      public Rectangle(int semiHeight, int semiWidth){
-          this.semiHeight = semiHeight;
-          this.semiWidth = semiWidth;
+      public static Rectangle ParseJSON(dynamic JSON) {
+          return new Rectangle(Vector2.ParseJSON(JSON.semiSize));
       }
 
-      public override string ToString(){
-          return "cool rectangle";
+      private Vector2 _semiSize;
+
+      public Rectangle(Vector2 semiSize) {
+          this._semiSize = semiSize;
       }
 
+      public string ToString(int indent) {
+          string indentText = String.Concat(Enumerable.Repeat("\t", indent));
+          return indentText + $"Rectangle {{ semiSize: {this._semiSize} }}";
+      }
+
+      public override string ToString() {
+          return this.ToString(0);
+      }
   }
 
 }

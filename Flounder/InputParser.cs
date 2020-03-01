@@ -9,34 +9,36 @@ namespace Flounder
 {
     public static class InputParser
     {
-        public static string FileToJson(string fileLocaton){
+        public static string FileToJson(string fileLocation) {
+            StreamReader streamReader = null;
             try {
-                StreamReader streamReader = new StreamReader(fileLocaton);
-                string jsonString = streamReader.ReadToEnd();
-                streamReader.Close();
-                return jsonString;
+                FileStream fileStream = new FileStream(fileLocation, FileMode.Open);
+                streamReader = new StreamReader(fileStream);
+                return streamReader.ReadToEnd();;
             }
-            catch (IOException e){
-                Debug.WriteLine(e);
+            catch (Exception exception) {
+                Console.WriteLine(exception);
+                Debug.WriteLine(exception);
                 return null;
+            }
+            finally {
+                streamReader?.Close();
             }
         }
         
-        public static Simulation ParseInput(string jsonString){
+        public static Simulation ParseInput(string jsonString) {
+            List<Body> bodies = new List<Body>();
             try {
-                var jsonObject = JObject.Parse(jsonString);
-                Simulation simulation = JsonConvert.DeserializeObject<Simulation>(jsonString);
-                Debug.WriteLine(simulation);
+                
             }
             catch (JsonReaderException exception){
                 Debug.WriteLine(exception);
             }
-            catch (JsonSerializationException excepton) {
-                Debug.WriteLine(excepton);
+            catch (JsonSerializationException exception) {
+                Debug.WriteLine(exception);
             }
 
-            List<Body> bodies = new List<Body>();
-            return new Simulation(bodies);
+            return new Simulation(null);
         }
     }
 

@@ -1,26 +1,48 @@
 {
     "bodies": [
         {
-            "id": "1",
-            "mass": "1",
-            "x": "1",
-            "y": "1",
+            "id": 1,
+            "mass": 1,
             "shape":{
                 "circle": {
-                    "radius": "1"
+                    "radius": 1
                 }
+            },
+            "position": {
+                "x": 1,
+                "y": 1
+            },
+            "velocity": {
+                "x": 1,
+                "y": 1
+            },
+            "acceleration": {
+                "x": 0,
+                "y": 0
             }
         },
         {
-            "id": "1",
-            "mass": "1",
-            "x": "1",
-            "y": "1",
+            "id": 2,
+            "mass": 1,
             "shape":{
                 "rectangle":{
-                    "semiWidth": "1",
-                    "semiHeight": "1"
+                    "semiSize": {
+                        "x": 1,
+                        "y": 1
+                    }
                 }
+            },
+            "position": {
+                "x": 1,
+                "y": 1
+            },
+            "velocity": {
+                "x": 1,
+                "y": 1
+            },
+            "acceleration": {
+                "x": 0,
+                "y": 0
             }
         }
     ]
