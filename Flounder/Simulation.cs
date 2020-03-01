@@ -9,28 +9,29 @@ namespace Flounder
     {
 
         public static Simulation ParseJSON(dynamic JSON) {
-            SortedDictionary<int, Body> bodies = new SortedDictionary<int, Body>();
+            List<Body> bodies = new List<Body>();
             foreach (Newtonsoft.Json.Linq.JObject bodyJSON in JSON.bodies)
             {
-                Body body = Body.ParseJSON(bodyJSON);
-                bodies[body.ID] = body;
+                bodies.Add(Body.ParseJSON(bodyJSON));
             }
             return new Simulation(bodies);
         }
         
-	private const SortedDictionary<string, Body> _bodies;
+	private readonly SortedDictionary<int, Body> _bodies = new SortedDictionary<int, Body>();
 
-    public Body getBodyByID(string bodyID){
-        return _bodies[bodyID];
+    public Body GetBody(int bodyID){
+        return this._bodies[bodyID];
     }
 
-    public Simulation(SortedDictionary<string, Body> bodies) {
-        this._bodies = bodies;
+    public Simulation(List<Body> bodies) {
+        foreach (Body body in bodies) {
+            this._bodies[body.ID] = body;
+        }
     }
 	public string ToString(int indent) {
             string indentText = String.Concat(Enumerable.Repeat("\t", indent));
             string text = indentText + "Simulation { bodies: [\n";
-            foreach (Body body in this._bodies) {
+            foreach (Body body in this._bodies.Values) {
                 text += indentText + body.ToString(indent + 1) + ",\n";
             }
             text += indentText + "] }";
