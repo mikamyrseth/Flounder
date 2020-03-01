@@ -21,26 +21,5 @@ namespace Flounder
                 return null;
             }
         }
-        
-        public static Simulation ParseInput(string jsonString){
-            var settings = new JsonSerializerSettings(){TypeNameHandling = TypeNameHandling.Auto};
-            
-            try {
-                var jsonObject = JObject.Parse(jsonString);
-                Simulation simulation = JsonConvert.DeserializeObject<Simulation>(jsonString, settings);
-                Debug.WriteLine("created simulation " + simulation);
-                return simulation;
-            }
-            catch (JsonReaderException exception){
-                Debug.WriteLine(exception);
-            }
-            catch (JsonSerializationException excepton) {
-                Debug.WriteLine(excepton);
-            }
-
-            List<Body> bodies = new List<Body>();
-            return new Simulation(bodies);
-        }
     }
-
 }

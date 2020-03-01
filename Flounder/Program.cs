@@ -8,7 +8,6 @@ namespace Flounder
 
     static void Main(string[] args) { 
       Console.WriteLine("Hello World!"); 
-      InputParser.ParseInput(InputParser.FileToJson("inputSchema.json"));
     }
 
   }

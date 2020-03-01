@@ -12,20 +12,7 @@ namespace Flounder
             this._id = id;
             this._force = force;
         }
-
-
-        [JsonConstructor]
-        public ConstantForce(
-                string id,
-                int forceX,
-                int forceY,
-                List<string> bodies
-        ):
-            this(
-                id,
-                new Vector2(forceX, forceY)
-            ) { } 
-
+        
         public override string ToString (){
           return "cool force";
       }

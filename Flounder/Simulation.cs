@@ -6,15 +6,20 @@ namespace Flounder
     public class Simulation
     {
         
-        private List<Body> _bodies;
+        //private List<Body> _bodies;
+        private SortedDictionary<string, Body> _bodies;
 
-        public Simulation(List<Body> bodies) {
+        public Body getBodyByID(string bodyID){
+            return _bodies[bodyID];
+        }
+
+        public Simulation(SortedDictionary<string, Body> bodies) {
             this._bodies = bodies;
         }
 
         public override string ToString(){
             string returnString = "Simulation with ";
-            foreach (Body body in this._bodies){
+            foreach (Body body in this._bodies.Values){
                 returnString+=body.ToString() + ", ";
             }
             return returnString;
