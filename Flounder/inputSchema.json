@@ -1,43 +1,49 @@
 {
     "bodies": [
         {
-            "id": "1",
-            "mass": "1",
-            "positionX": "1",
-            "positionY": "1",
+            "id": 1,
+            "mass": 1,
             "shape":{
-                "$type": "Flounder.Circle, Flounder",
-                "radius": "5"
+                "circle": {
+                    "radius": 1
+                }
             },
-            "accelerationX": "1",
-            "accelerationY": "1",
-            "velocityX": "1",
-            "velocityY": "1"
+            "position": {
+                "x": 1,
+                "y": 1
+            },
+            "velocity": {
+                "x": 1,
+                "y": 1
+            },
+            "acceleration": {
+                "x": 0,
+                "y": 0
+            }
         },
         {
-            "id": "2",
-            "mass": "1",
-            "positionX": "1",
-            "positionY": "1",
+            "id": 2,
+            "mass": 1,
             "shape":{
-                "$type": "Flounder.Rectangle, Flounder",
-                "semiWidth": "1",
-                "semiHeight": "1"
+                "rectangle":{
+                    "semiSize": {
+                        "x": 1,
+                        "y": 1
+                    }
+                }
             },
-            "accelerationX": "1",
-            "accelerationY": "1",
-            "velocityX": "1",
-            "velocityY": "1"
-        }
-    ],
-    "forces": [
-        {
-            "id": "3",
-            "forceX": "1",
-            "forceY": "1",
-            "bodies": [
-                "1", "2"
-            ]
+            "position": {
+                "x": 1,
+                "y": 1
+            },
+            "velocity": {
+                "x": 1,
+                "y": 1
+            },
+            "acceleration": {
+                "x": 0,
+                "y": 0
+            }
         }
     ]
 }

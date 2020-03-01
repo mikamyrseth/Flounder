@@ -1,8 +1,15 @@
-﻿namespace Flounder
+﻿using System;
+using Newtonsoft.Json.Linq;
+
+namespace Flounder
 {
     public struct Vector2
     {
 
+        public static Vector2 ParseJSON(dynamic JSON) {
+            return new Vector2(int.Parse((string) JSON.x), int.Parse((string) JSON.y));
+        }
+        
         public static Vector2 operator +(Vector2 a, Vector2 b) {
             return new Vector2(a._x + b._x, a._y + b._y);
         }
@@ -33,6 +40,10 @@
         public Vector2(float x, float y) {
             this._x = x;
             this._y = y;
+        }
+
+        public override string ToString() {
+            return $"({this.X}, {this.Y})";
         }
     }
 }

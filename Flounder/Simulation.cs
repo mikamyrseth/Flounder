@@ -1,28 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Flounder
 {
     
-    public class Simulation
+    public class Simulation : IIndentedLogger
     {
-        
-        //private List<Body> _bodies;
-        private SortedDictionary<string, Body> _bodies;
 
-        public Body getBodyByID(string bodyID){
-            return _bodies[bodyID];
-        }
-
-        public Simulation(SortedDictionary<string, Body> bodies) {
-            this._bodies = bodies;
-        }
-
-        public override string ToString(){
-            string returnString = "Simulation with ";
-            foreach (Body body in this._bodies.Values){
-                returnString+=body.ToString() + ", ";
+        public static Simulation ParseJSON(dynamic JSON) {
+            SortedDictionary<int, Body> bodies = new SortedDictionary<int, Body>();
+            foreach (Newtonsoft.Json.Linq.JObject bodyJSON in JSON.bodies)
+            {
+                Body body = Body.ParseJSON(bodyJSON);
+                bodies[body.ID] = body;
             }
-            return returnString;
+            return new Simulation(bodies);
+        }
+        
+	private const SortedDictionary<string, Body> _bodies;
+
+    public Body getBodyByID(string bodyID){
+        return _bodies[bodyID];
+    }
+
+    public Simulation(SortedDictionary<string, Body> bodies) {
+        this._bodies = bodies;
+    }
+	public string ToString(int indent) {
+            string indentText = String.Concat(Enumerable.Repeat("\t", indent));
+            string text = indentText + "Simulation { bodies: [\n";
+            foreach (Body body in this._bodies) {
+                text += indentText + body.ToString(indent + 1) + ",\n";
+            }
+            text += indentText + "] }";
+            return text;
+        }
+
+        public override string ToString() {
+            return this.ToString(0);
         }
 
         public void Start(int ticks) {

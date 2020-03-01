@@ -9,16 +9,20 @@ namespace Flounder
 {
     public static class InputParser
     {
-        public static string FileToJson(string fileLocaton){
+        public static string FileToJson(string fileLocation) {
+            StreamReader streamReader = null;
             try {
-                StreamReader streamReader = new StreamReader(fileLocaton);
-                string jsonString = streamReader.ReadToEnd();
-                streamReader.Close();
-                return jsonString;
+                FileStream fileStream = new FileStream(fileLocation, FileMode.Open);
+                streamReader = new StreamReader(fileStream);
+                return streamReader.ReadToEnd();;
             }
-            catch (IOException e){
-                Debug.WriteLine(e);
+            catch (Exception exception) {
+                Console.WriteLine(exception);
+                Debug.WriteLine(exception);
                 return null;
+            }
+            finally {
+                streamReader?.Close();
             }
         }
     }
