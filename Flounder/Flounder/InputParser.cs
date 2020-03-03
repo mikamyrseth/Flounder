@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System;
+﻿using System;
 using System.Diagnostics;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace Flounder
 {
@@ -14,7 +11,8 @@ namespace Flounder
             try {
                 FileStream fileStream = new FileStream(fileLocation, FileMode.Open);
                 streamReader = new StreamReader(fileStream);
-                return streamReader.ReadToEnd();;
+                return streamReader.ReadToEnd();
+                ;
             }
             catch (Exception exception) {
                 Console.WriteLine(exception);

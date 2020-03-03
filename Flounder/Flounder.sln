@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flounder", "Flounder.csproj", "{B5DD8935-C1CC-4168-88E9-899A892FC23D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flounder", "Flounder\Flounder.csproj", "{8A2C2475-BB5D-4BD8-A52C-70549AB77A95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlounderTest", "FlounderTest\FlounderTest.csproj", "{2E47416C-EBFF-46A7-9D0D-F380637D0808}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +10,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B5DD8935-C1CC-4168-88E9-899A892FC23D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5DD8935-C1CC-4168-88E9-899A892FC23D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5DD8935-C1CC-4168-88E9-899A892FC23D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5DD8935-C1CC-4168-88E9-899A892FC23D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A2C2475-BB5D-4BD8-A52C-70549AB77A95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A2C2475-BB5D-4BD8-A52C-70549AB77A95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A2C2475-BB5D-4BD8-A52C-70549AB77A95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A2C2475-BB5D-4BD8-A52C-70549AB77A95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E47416C-EBFF-46A7-9D0D-F380637D0808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E47416C-EBFF-46A7-9D0D-F380637D0808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E47416C-EBFF-46A7-9D0D-F380637D0808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E47416C-EBFF-46A7-9D0D-F380637D0808}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
