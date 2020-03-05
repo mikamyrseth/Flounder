@@ -4,8 +4,8 @@ namespace Flounder
 {
     public struct Rectangle : IShape
     {
-        public static Rectangle ParseJSON(dynamic JSON) {
-            return new Rectangle(Vector2.ParseJSON(JSON.semiSize));
+        public static Rectangle ParseJSO(dynamic JSON) {
+            return new Rectangle(Vector2.ParseJSO(JSON.semiSize));
         }
 
         private readonly Vector2 _semiSize;

@@ -2,7 +2,7 @@
 {
     public struct Vector2
     {
-        public static Vector2 ParseJSON(dynamic JSON) {
+        public static Vector2 ParseJSO(dynamic JSON) {
             return new Vector2((float) JSON.x, (float) JSON.y);
         }
 

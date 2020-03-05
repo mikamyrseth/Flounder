@@ -11,9 +11,9 @@ namespace Flounder
                 (int) JSON.id,
                 (int) JSON.mass,
                 IShape.ParseJSON(JSON.shape),
-                Vector2.ParseJSON(JSON.position),
-                Vector2.ParseJSON(JSON.velocity),
-                Vector2.ParseJSON(JSON.acceleration)
+                Vector2.ParseJSO(JSON.position),
+                Vector2.ParseJSO(JSON.velocity),
+                Vector2.ParseJSO(JSON.acceleration)
             );
         }
 

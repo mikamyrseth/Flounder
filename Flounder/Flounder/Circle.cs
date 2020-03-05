@@ -2,15 +2,17 @@ using System.Linq;
 
 namespace Flounder
 {
-    internal struct Circle : IIndentedLogger, IShape
+    public struct Circle : IShape
     {
-        public static Circle ParseJSON(dynamic JSON) {
-            return new Circle((int) JSON.radius);
+        public static Circle ParseJSO(dynamic jso) {
+            return new Circle((float) jso.radius);
         }
 
-        private readonly int _radius;
+        private readonly float _radius;
 
-        public Circle(int radius) {
+        public float Radius { get { return this._radius; } }
+
+        public Circle(float radius) {
             this._radius = radius;
         }
 
