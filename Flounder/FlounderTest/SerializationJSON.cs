@@ -7,27 +7,27 @@ using Xunit.Abstractions;
 
 namespace FlounderTest
 {
-    public class ParseJSO
+    public class SerializationJSON
     {
         
         private CultureInfo _culture;
         private readonly ITestOutputHelper _output;
 
-        public ParseJSO(ITestOutputHelper output)
+        public SerializationJSON(ITestOutputHelper output)
         {
             this._culture = CultureInfo.InvariantCulture;
             this._output = output;
         }
 
         private void CircleCase(float radius) {
-            string json = $"{{ \"radius\": {radius.ToString(this._culture)} }}";
+            string json = new Circle(radius).SerializeJSON(0);
             dynamic jso = JsonConvert.DeserializeObject(json);
             Circle circle = Flounder.Circle.ParseJSO(jso);
             Assert.Equal(radius, circle.Radius);
         }
 
         private void RectangleCase(float semiHeight, float semiWidth) {
-            string json = $"{{ \"semiSize\": {{ \"x\": {semiWidth.ToString(this._culture)}, \"y\": {semiHeight.ToString(this._culture)} }} }}";
+            string json = new Rectangle(new Vector2(semiWidth, semiHeight)).SerializeJSON(0);
             dynamic jso = JsonConvert.DeserializeObject(json);
             Rectangle rectangle = Flounder.Rectangle.ParseJSO(jso);
             Assert.Equal(semiHeight, rectangle.SemiHeight);
@@ -35,7 +35,7 @@ namespace FlounderTest
         }
         
         private void Vector2Case(float x, float y) {
-            string json = $"{{ \"x\": {x.ToString(this._culture)}, \"y\": {y.ToString(this._culture)} }}";
+            string json = new Vector2(x, y).SerializeJSON(0);
             dynamic jso = JsonConvert.DeserializeObject(json);
             Vector2 vector = Flounder.Vector2.ParseJSO(jso);
             Assert.Equal(x, vector.X);
