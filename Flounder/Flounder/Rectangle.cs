@@ -10,6 +10,12 @@ namespace Flounder
 
         private readonly Vector2 _semiSize;
 
+        public float Height { get { return 2 * this.SemiHeight; } }
+        public float SemiHeight { get { return this._semiSize.Y; } }
+        public Vector2 SemiSize { get { return this._semiSize; } }
+        public float SemiWidth { get { return this._semiSize.X; } }
+        public float Width { get { return 2 * this.SemiWidth; } }
+
         public Rectangle(Vector2 semiSize) {
             this._semiSize = semiSize;
         }
