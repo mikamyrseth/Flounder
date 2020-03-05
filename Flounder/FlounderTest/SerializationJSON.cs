@@ -10,12 +10,10 @@ namespace FlounderTest
     public class SerializationJSON
     {
         
-        private CultureInfo _culture;
         private readonly ITestOutputHelper _output;
 
         public SerializationJSON(ITestOutputHelper output)
         {
-            this._culture = CultureInfo.InvariantCulture;
             this._output = output;
         }
 
@@ -24,6 +22,14 @@ namespace FlounderTest
             dynamic jso = JsonConvert.DeserializeObject(json);
             Circle circle = Flounder.Circle.ParseJSO(jso);
             Assert.Equal(radius, circle.Radius);
+        }
+
+        private void ConstantForceCase(string id, Vector2 force) {
+            string json = new ConstantForce(id, force).SerializeJSON(0);
+            dynamic jso = JsonConvert.DeserializeObject(json);
+            ConstantForce constantForce = Flounder.ConstantForce.ParseJSO(jso);
+            Assert.Equal(id, constantForce.ID);
+            Assert.Equal(force, constantForce.Force);
         }
 
         private void RectangleCase(float semiHeight, float semiWidth) {
@@ -66,6 +72,16 @@ namespace FlounderTest
             this.CircleCase(1.0f);
             this.CircleCase(3.14f);
             this.CircleCase(1234.5678f);
+        }
+
+        [Fact]
+        public void ConstantForce() {
+            this.ConstantForceCase("gravity", new Vector2(-9.81f, 0f));
+            this.ConstantForceCase("gravity", new Vector2(9.81f, 0f));
+            this.ConstantForceCase("gravity", new Vector2(0f, -9.81f));
+            this.ConstantForceCase("gravity", new Vector2(0f, 9.81f));
+            this.ConstantForceCase("force", new Vector2(2f, -9.81f));
+            this.ConstantForceCase("force", new Vector2(2f, 9.81f));
         }
 
         [Fact]
