@@ -34,6 +34,23 @@ namespace FlounderTest
             Assert.Equal(semiWidth, rectangle.SemiWidth);
         }
         
+        private void ShapeCircleCase(float radius) {
+            IShape shape = new Circle(radius);
+            string json = shape.SerializeJSON(0);
+            dynamic jso = JsonConvert.DeserializeObject(json);
+            Circle circle = (Circle)IShape.ParseJSO(jso);
+            Assert.Equal(radius, circle.Radius);
+        }
+
+        private void ShapeRectangleCase(float semiHeight, float semiWidth) {
+            IShape shape = new Rectangle(new Vector2(semiWidth, semiHeight));
+            string json = shape.SerializeJSON(0);
+            dynamic jso = JsonConvert.DeserializeObject(json);
+            Rectangle rectangle = (Rectangle)IShape.ParseJSO(jso);
+            Assert.Equal(semiHeight, rectangle.SemiHeight);
+            Assert.Equal(semiWidth, rectangle.SemiWidth);
+        }
+        
         private void Vector2Case(float x, float y) {
             string json = new Vector2(x, y).SerializeJSON(0);
             dynamic jso = JsonConvert.DeserializeObject(json);
@@ -57,6 +74,16 @@ namespace FlounderTest
             this.RectangleCase(1f, 2f);
             this.RectangleCase(4.2f, 2.5f);
             this.RectangleCase(52132.13523f, 123512.6431f);
+        }
+
+        [Fact]
+        public void Shape() {
+            this.ShapeCircleCase(1f);
+            this.ShapeCircleCase(0.5f);
+            this.ShapeCircleCase(1235.1235f);
+            this.ShapeRectangleCase(2f, 3f);
+            this.ShapeRectangleCase(0.1f, 0.2f);
+            this.ShapeRectangleCase(6812.648f, 1236.6593f);
         }
         
         [Fact]
