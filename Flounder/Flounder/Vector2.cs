@@ -1,4 +1,6 @@
-﻿namespace Flounder
+﻿using System.Linq;
+
+namespace Flounder
 {
     public struct Vector2
     {
@@ -36,6 +38,15 @@
         public Vector2(float x, float y) {
             this.X = x;
             this.Y = y;
+        }
+
+        public string SerializeJSON(int indent) {
+            string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+            string text = indentText + "{\n";
+            text += indentText + $"\t\"x\": {this.X},\n";
+            text += indentText + $"\t\"y\": {this.Y}\n";
+            text += indentText + "}";
+            return text;
         }
 
         public override string ToString() {
