@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 
 namespace Flounder
 {
-    public struct Vector2
+    public readonly struct Vector2 : ISerializableJSON
     {
         public static Vector2 ParseJSON(dynamic JSON) {
             return new Vector2((float) JSON.x, (float) JSON.y);
@@ -42,9 +43,9 @@ namespace Flounder
 
         public string SerializeJSON(int indent) {
             string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-            string text = indentText + "{\n";
-            text += indentText + $"\t\"x\": {this.X},\n";
-            text += indentText + $"\t\"y\": {this.Y}\n";
+            string text = "{\n";
+            text += indentText + $"\t\"x\": {this.X.ToString(CultureInfo.InvariantCulture)},\n";
+            text += indentText + $"\t\"y\": {this.Y.ToString(CultureInfo.InvariantCulture)}\n";
             text += indentText + "}";
             return text;
         }
@@ -52,5 +53,6 @@ namespace Flounder
         public override string ToString() {
             return $"({this.X}, {this.Y})";
         }
+
     }
 }
