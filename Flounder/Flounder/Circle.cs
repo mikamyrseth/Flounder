@@ -1,17 +1,28 @@
+using System.Globalization;
 using System.Linq;
 
 namespace Flounder
 {
-    internal struct Circle : IIndentedLogger, IShape
+    public struct Circle : IIndentedLogger, IShape
     {
         public static Circle ParseJSON(dynamic JSON) {
             return new Circle((int) JSON.radius);
         }
 
-        private readonly int _radius;
+        private readonly float _radius;
 
-        public Circle(int radius) {
+        public Circle(float radius) {
             this._radius = radius;
+        }
+
+        string IShape.SerializeJSON(int indent) { return IShape.SerializeJSON(indent, "circle", this.SerializeJSON(indent + 1)); }
+
+        public string SerializeJSON(int indent) {
+            string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+            string text = "{\n";
+            text += indentText + $"\t\"radius\": {this._radius.ToString(CultureInfo.InvariantCulture)}\n";
+            text += indentText + "}";
+            return text;
         }
 
         public string ToString(int indent) {
