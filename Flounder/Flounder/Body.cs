@@ -7,14 +7,14 @@ namespace Flounder
 {
     public struct Body : IIndentedLogger, ISerializableJSON
     {
-        public static Body ParseJSON(dynamic JSON) {
+        public static Body ParseJSO(dynamic jso) {
             return new Body(
-                (int) JSON.id,
-                (int) JSON.mass,
-                IShape.ParseJSON(JSON.shape),
-                Vector2.ParseJSO(JSON.position),
-                Vector2.ParseJSO(JSON.velocity),
-                Vector2.ParseJSO(JSON.acceleration)
+                (int) jso.id,
+                (int) jso.mass,
+                IShape.ParseJSO(jso.shape),
+                Vector2.ParseJSO(jso.position),
+                Vector2.ParseJSO(jso.velocity),
+                Vector2.ParseJSO(jso.acceleration)
             );
         }
 

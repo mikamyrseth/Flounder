@@ -26,7 +26,7 @@ namespace Flounder
 
         public static Simulation ParseJSON(dynamic JSON) {
             List<Body> bodies = new List<Body>();
-            foreach (JObject bodyJSON in JSON.bodies) bodies.Add(Body.ParseJSON(bodyJSON));
+            foreach (JObject bodyJSON in JSON.bodies) bodies.Add(Body.ParseJSO(bodyJSON));
             return new Simulation(bodies);
         }
 

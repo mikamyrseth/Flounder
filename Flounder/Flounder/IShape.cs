@@ -6,12 +6,12 @@ namespace Flounder
     public interface IShape : IIndentedLogger, ISerializableJSON
     {
         
-        public static IShape ParseJSON(dynamic json) {
-            if (json.circle != null) {
-                return Circle.ParseJSON(json.circle);
+        public static IShape ParseJSO(dynamic jso) {
+            if (jso.circle != null) {
+                return Circle.ParseJSO(jso.circle);
             }
-            if (json.rectangle != null) {
-                return Rectangle.ParseJSON(json.rectangle);
+            if (jso.rectangle != null) {
+                return Rectangle.ParseJSO(jso.rectangle);
             }
             return null;
         }
