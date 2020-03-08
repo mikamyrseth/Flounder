@@ -3,7 +3,7 @@
         {
             "id": 1,
             "mass": 1,
-            "shape":{
+            "shape": {
                 "circle": {
                     "radius": 1
                 }
@@ -24,8 +24,8 @@
         {
             "id": 2,
             "mass": 1,
-            "shape":{
-                "rectangle":{
+            "shape": {
+                "rectangle": {
                     "semiSize": {
                         "x": 1,
                         "y": 1

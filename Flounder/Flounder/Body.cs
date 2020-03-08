@@ -28,10 +28,9 @@ namespace Flounder
         public int ID { get; }
 
         public Body(int id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
-            if (shape == null) throw new ArgumentException("Shape cannot be null");
             this.ID = id;
             this._mass = mass;
-            this._shape = shape;
+            this._shape = shape ?? throw new ArgumentException("Shape cannot be null");
             this._position = position;
             this._velocity = velocity;
             this._acceleration = acceleration;
