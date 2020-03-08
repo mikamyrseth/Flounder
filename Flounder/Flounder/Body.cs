@@ -20,9 +20,9 @@ namespace Flounder
 
         private readonly float _mass;
         private readonly IShape _shape;
-        private readonly Vector2 _position;
-        private readonly Vector2 _velocity;
-        private readonly Vector2 _acceleration;
+        private Vector2 _position;
+        private Vector2 _velocity;
+        private Vector2 _acceleration;
         private readonly List<ConstantForce> _forces;
 
         public string ID { get; }
@@ -71,6 +71,27 @@ namespace Flounder
 
         public override string ToString() {
             return this.ToString(0);
+        }
+
+        public void addConstantForce(ConstantForce constantForce){
+            _forces.Add(constantForce);
+        }
+
+        public void Tick(float deltaT) {
+            updateAcceleraton();
+            updateVelocity(deltaT);
+        }
+
+        private void updateAcceleraton(){
+            Vector2 sigmaF = new Vector2(0, 0);
+            foreach(ConstantForce force in _forces){
+                sigmaF += force.Force;
+            }
+            _acceleration = sigmaF/_mass;
+        }
+
+        private void updateVelocity(float deltaT){
+            _velocity += deltaT * _acceleration;
         }
 
     }

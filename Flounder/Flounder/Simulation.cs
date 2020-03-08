@@ -7,9 +7,14 @@ namespace Flounder
     public class Simulation : IIndentedLogger
     {
         private readonly SortedDictionary<string, Body> _bodies = new SortedDictionary<string, Body>();
+        private readonly float _deltaT; 
 
-        public Simulation(List<Body> bodies) {
-            foreach (Body body in bodies) this._bodies[body.ID] = body;
+        private List<ConstantForce> _constantForces;
+        
+        public Simulation(SortedDictionary<string, Body> bodies, float deltaT, List<ConstantForce> constantForces) {
+            _bodies = bodies;
+            _deltaT = deltaT;
+            _constantForces = constantForces;
         }
 
         public string ToString(int indent) {
@@ -25,9 +30,26 @@ namespace Flounder
         }
 
         public static Simulation ParseJSON(dynamic JSON) {
-            List<Body> bodies = new List<Body>();
-            foreach (JObject bodyJSON in JSON.bodies) bodies.Add(Body.ParseJSO(bodyJSON));
-            return new Simulation(bodies);
+            SortedDictionary<string, Body> bodies = new SortedDictionary<string, Body>();
+            foreach (JObject bodyJSON in JSON.bodies) {
+                Body body = Body.ParseJSO(bodyJSON);
+                bodies.Add(body.ID, body);
+            }
+
+            float deltaT = JSON.deltaT;
+            
+            List<ConstantForce> constantForces = new List<ConstantForce>();
+            foreach (dynamic forceJSON in JSON.constantForces) {
+                ConstantForce constantForce = ConstantForce.ParseJSO(forceJSON);
+                constantForces.Add(constantForce);
+                foreach(string bodyID in forceJSON.bodies){
+                    if(bodies.ContainsKey(bodyID)){
+                        (bodies[bodyID]).addConstantForce(constantForce);
+                    }
+                }
+            }
+            
+            return new Simulation(bodies, deltaT, constantForces);
         }
 
         public Body GetBody(string bodyID) {
@@ -38,6 +60,10 @@ namespace Flounder
             for (int i = 0; i < ticks; i++) this.Tick();
         }
 
-        private void Tick() { }
+        private void Tick() {
+            foreach(Body body in _bodies.Values){
+                body.Tick(_deltaT);
+            }
+        }
     }
 }
