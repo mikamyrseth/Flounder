@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Flounder
 {
@@ -36,7 +37,11 @@ namespace Flounder
         }
 
         public static ImpliedFraction operator *(ImpliedFraction a, ImpliedFraction b) {
-            return new ImpliedFraction(a._numerator * b._numerator >> (int) _precision);
+            return new ImpliedFraction((a._numerator >> ((int) _precision / 2)) * (b._numerator >> ((int) _precision / 2)));
+        }
+
+        public static ImpliedFraction operator /(ImpliedFraction dividend, ImpliedFraction divisor) {
+            return new ImpliedFraction((dividend._numerator << ((int) _precision / 2)) / (divisor._numerator >> ((int) _precision / 2)));
         }
 
         private readonly long _numerator;
@@ -52,9 +57,26 @@ namespace Flounder
         public ImpliedFraction(long numerator) {
             this._numerator = numerator;
         }
+
+        public ImpliedFraction(string text) {
+            if (new Regex(@"\A-?\d+(\.\d+)?\z").IsMatch(text)) {
+                throw new NotImplementedException();
+                bool minusFlag = false;
+                ImpliedFraction integerIF = new ImpliedFraction(0),
+                                decimalIF = new ImpliedFraction(0);
+                if (text[0] == '-') { minusFlag = true; }
+                if (text.Contains('.')) {
+                    string decimalText = text.Substring(text.IndexOf('.') + 1);
+                    long dividend = long.Parse(decimalText);
+                    long divisor = 1;
+                }
+            } else {
+                throw new ArgumentException("Could not parse format of string into ImpliedFraction!");
+            }
+        }
     
         public override string ToString() {
-            return $"ImpliedFraction {{ Value: {this._numerator}, Precision: {_precision} }}";
+            return $"ImpliedFraction {{ Numerator: {this._numerator}, Precision: {_precision} }}";
         }
     
     }
