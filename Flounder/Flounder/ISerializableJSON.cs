@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Flounder
+﻿namespace Flounder
 {
 
   public interface ISerializableJSON
