@@ -9,7 +9,7 @@ namespace Flounder
     {
         public static Body ParseJSO(dynamic jso) {
             return new Body(
-                (int) jso.id,
+                (string) jso.id,
                 (int) jso.mass,
                 IShape.ParseJSO(jso.shape),
                 Vector2.ParseJSO(jso.position),
@@ -25,9 +25,9 @@ namespace Flounder
         private readonly Vector2 _acceleration;
         private readonly List<ConstantForce> _forces;
 
-        public int ID { get; }
+        public string ID { get; }
 
-        public Body(int id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
+        public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
             if (shape == null) throw new ArgumentException("Shape cannot be null");
             this.ID = id;
             this._mass = mass;
@@ -38,10 +38,10 @@ namespace Flounder
             this._forces = new List<ConstantForce>();
         }
 
-        public Body(int id, float mass, IShape shape, Vector2 position) :
+        public Body(string id, float mass, IShape shape, Vector2 position) :
             this(id, mass, shape, position, new Vector2(0, 0)) { }
 
-        public Body(int id, float mass, IShape shape, Vector2 position, Vector2 velocity) :
+        public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) :
             this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
 
         public string SerializeJSON(int indent) {

@@ -6,7 +6,7 @@ namespace Flounder
 {
     public class Simulation : IIndentedLogger
     {
-        private readonly SortedDictionary<int, Body> _bodies = new SortedDictionary<int, Body>();
+        private readonly SortedDictionary<string, Body> _bodies = new SortedDictionary<string, Body>();
 
         public Simulation(List<Body> bodies) {
             foreach (Body body in bodies) this._bodies[body.ID] = body;
@@ -30,7 +30,7 @@ namespace Flounder
             return new Simulation(bodies);
         }
 
-        public Body GetBody(int bodyID) {
+        public Body GetBody(string bodyID) {
             return this._bodies[bodyID];
         }
 
