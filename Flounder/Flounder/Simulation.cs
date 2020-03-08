@@ -10,12 +10,15 @@ namespace Flounder
         private readonly SortedDictionary<string, Body> _bodies = new SortedDictionary<string, Body>();
         private readonly float _deltaT; 
 
+        private float _duration;
+
         private List<ConstantForce> _constantForces;
         
-        public Simulation(SortedDictionary<string, Body> bodies, float deltaT, List<ConstantForce> constantForces) {
+        public Simulation(SortedDictionary<string, Body> bodies, float deltaT, List<ConstantForce> constantForces, float duration) {
             _bodies = bodies;
             _deltaT = deltaT;
             _constantForces = constantForces;
+            _duration = duration;
         }
 
         public string ToString(int indent) {
@@ -38,6 +41,8 @@ namespace Flounder
             }
 
             float deltaT = JSON.deltaT;
+
+            float duration = JSON.duration;
             
             List<ConstantForce> constantForces = new List<ConstantForce>();
             foreach (dynamic forceJSON in JSON.constantForces) {
@@ -50,21 +55,24 @@ namespace Flounder
                 }
             }
             
-            return new Simulation(bodies, deltaT, constantForces);
+            return new Simulation(bodies, deltaT, constantForces, duration);
         }
 
         public Body GetBody(string bodyID) {
             return this._bodies[bodyID];
         }
 
-        public void Start(int ticks) {
-            for (int i = 0; i < ticks; i++) this.Tick();
+        public void Start() {
+            while(_duration > 0){
+                Tick();
+            }
         }
 
-        public void Tick() {
+        private void Tick() {
             foreach(Body body in _bodies.Values){
                 body.Tick(_deltaT);
             }
+            _duration -= _deltaT;
         }
     }
 }

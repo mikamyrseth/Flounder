@@ -2,7 +2,7 @@
     "bodies": [
         {
             "id": "Frida",
-            "mass": 1,
+            "mass": 5,
             "shape": {
                 "circle": {
                     "radius": 1
@@ -23,7 +23,7 @@
         },
         {
             "id": "Solveig",
-            "mass": 1,
+            "mass": 100,
             "shape": {
                 "rectangle": {
                     "semiSize": {
@@ -48,12 +48,13 @@
     ],
     "deltaT": 1,
     "precission": "Nano",
+    "duration": 60,
     "constantForces": [
         {
-            "id": "gravity",
+            "id": "10 N nedover",
             "vector": {
-                "x": -9.81,
-                "y": 0
+                "x": 5,
+                "y": -10
             },
             "bodies":[
                 "Frida", "Solveig", "Ingeborg"
