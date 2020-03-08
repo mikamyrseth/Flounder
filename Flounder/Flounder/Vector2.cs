@@ -51,7 +51,7 @@ namespace Flounder
         }
 
         public override string ToString() {
-            return $"({this.X}, {this.Y})";
+            return $"({this.X.ToString(CultureInfo.InvariantCulture)}, {this.Y.ToString(CultureInfo.InvariantCulture)})";
         }
 
     }
