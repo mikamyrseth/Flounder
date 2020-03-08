@@ -10,7 +10,7 @@ namespace Flounder
             String Jsonstring = InputParser.FileToJson("inputSchema.json");
             dynamic JsonObject = JsonConvert.DeserializeObject(Jsonstring);
             Simulation simulation = Simulation.ParseJSON(JsonObject);
-            simulation.Tick();
+            simulation.Start();
             Console.WriteLine(simulation); 
         }
         
