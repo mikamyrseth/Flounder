@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Flounder
 {
@@ -14,7 +15,10 @@ namespace Flounder
       this.ID = id;
     }
 
-    public string SerializeJSON(int indent) {
+    public string SerializeJSON(int indent = 0, bool singleLine = false) {
+      if (singleLine) {
+        throw new NotImplementedException();
+      }
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"id\": \"{this.ID}\",\n";

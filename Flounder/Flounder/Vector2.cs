@@ -1,12 +1,13 @@
 ﻿using System.Globalization;
 using System.Linq;
+using IF = Flounder.ImpliedFraction;
 
 namespace Flounder
 {
     public readonly struct Vector2 : ISerializableJSON
     {
-        public static Vector2 ParseJSO(dynamic JSON) {
-            return new Vector2((float) JSON.x, (float) JSON.y);
+        public static Vector2 ParseJSO(dynamic jso) {
+            return new Vector2((float) jso.x, (float) jso.y);
         }
 
         public static Vector2 operator +(Vector2 a, Vector2 b) {
@@ -41,13 +42,17 @@ namespace Flounder
             this.Y = y;
         }
 
-        public string SerializeJSON(int indent) {
-            string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-            string text = "{\n";
-            text += indentText + $"\t\"x\": {this.X.ToString(CultureInfo.InvariantCulture)},\n";
-            text += indentText + $"\t\"y\": {this.Y.ToString(CultureInfo.InvariantCulture)}\n";
-            text += indentText + "}";
-            return text;
+        public string SerializeJSON(int indent = 0, bool singleLine = false) {
+            if (singleLine) {
+                return $"{{ \"x\": {this.X.ToString(CultureInfo.InvariantCulture)}, \"y\": {this.Y.ToString(CultureInfo.InvariantCulture)} }}";
+            } else {
+                string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+                string text = "{\n";
+                text += indentText + $"\t\"x\": {this.X.ToString(CultureInfo.InvariantCulture)},\n";
+                text += indentText + $"\t\"y\": {this.Y.ToString(CultureInfo.InvariantCulture)}\n";
+                text += indentText + "}";
+                return text;
+            }
         }
 
         public override string ToString() {

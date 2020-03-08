@@ -1,4 +1,5 @@
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Flounder
 {
@@ -22,7 +23,7 @@ namespace Flounder
 
         string IShape.SerializeJSON(int indent) { return IShape.SerializeJSON(indent, "rectangle", this.SerializeJSON(indent + 1)); }
 
-        public string SerializeJSON(int indent) {
+        public string SerializeJSON(int indent = 0, bool singleLine = false) {
             string indentText = string.Concat(Enumerable.Repeat("\t", indent));
             string text = "{\n";
             text += indentText + $"\t\"semiSize\": {this._semiSize.SerializeJSON(indent + 1)}\n";

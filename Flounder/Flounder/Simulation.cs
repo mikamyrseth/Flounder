@@ -24,9 +24,9 @@ namespace Flounder
             return this.ToString(0);
         }
 
-        public static Simulation ParseJSON(dynamic JSON) {
+        public static Simulation ParseJSO(dynamic jso) {
             List<Body> bodies = new List<Body>();
-            foreach (JObject bodyJSON in JSON.bodies) bodies.Add(Body.ParseJSO(bodyJSON));
+            foreach (JObject bodyJSON in jso.bodies) bodies.Add(Body.ParseJSO(bodyJSON));
             return new Simulation(bodies);
         }
 

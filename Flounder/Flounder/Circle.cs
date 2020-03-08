@@ -19,12 +19,16 @@ namespace Flounder
 
         string IShape.SerializeJSON(int indent) { return IShape.SerializeJSON(indent, "circle", this.SerializeJSON(indent + 1)); }
 
-        public string SerializeJSON(int indent) {
-            string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-            string text = "{\n";
-            text += indentText + $"\t\"radius\": {this.Radius.ToString(CultureInfo.InvariantCulture)}\n";
-            text += indentText + "}";
-            return text;
+        public string SerializeJSON(int indent = 0, bool singleLine = false) {
+            if (singleLine) {
+                return $"{{ \"radius\": {this.Radius.ToString(CultureInfo.InvariantCulture)} }}";
+            } else {
+                string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+                string text = "{\n";
+                text += indentText + $"\t\"radius\": {this.Radius.ToString(CultureInfo.InvariantCulture)}\n";
+                text += indentText + "}";
+                return text;
+            }
         }
 
         public string ToString(int indent) {

@@ -43,17 +43,21 @@ namespace Flounder
         public Body(int id, float mass, IShape shape, Vector2 position, Vector2 velocity) :
             this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
 
-        public string SerializeJSON(int indent) {
+        public string SerializeJSON(int indent = 0, bool singleLine = false) {
             string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-            string text = "{\n";
-            text += indentText + $"\t\"id\": {this.ID.ToString(CultureInfo.InvariantCulture)},\n";
-            text += indentText + $"\t\"mass\": {this._mass.ToString(CultureInfo.InvariantCulture)},\n";
-            text += indentText + $"\t\"shape\": {this._shape.SerializeJSON(indent + 1)},\n";
-            text += indentText + $"\t\"position\": {this._position.SerializeJSON(indent + 1)},\n";
-            text += indentText + $"\t\"velocity\": {this._velocity.SerializeJSON(indent + 1)},\n";
-            text += indentText + $"\t\"acceleration\": {this._acceleration.SerializeJSON(indent + 1)}\n";
-            text += indentText + "}";
-            return text;
+            if (singleLine) {
+                string text = "{\n";
+                text += indentText + $"\t\"id\": {this.ID.ToString(CultureInfo.InvariantCulture)},\n";
+                text += indentText + $"\t\"mass\": {this._mass.ToString(CultureInfo.InvariantCulture)},\n";
+                text += indentText + $"\t\"shape\": {this._shape.SerializeJSON(indent + 1)},\n";
+                text += indentText + $"\t\"position\": {this._position.SerializeJSON(indent + 1)},\n";
+                text += indentText + $"\t\"velocity\": {this._velocity.SerializeJSON(indent + 1)},\n";
+                text += indentText + $"\t\"acceleration\": {this._acceleration.SerializeJSON(indent + 1)}\n";
+                text += indentText + "}";
+                return text;
+            } else {
+                throw new NotImplementedException();
+            }
         }
 
         public string ToString(int indent) {
