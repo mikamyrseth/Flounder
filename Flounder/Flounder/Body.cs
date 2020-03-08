@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Flounder
 {
-    public struct Body : IIndentedLogger, ISerializableJSON
+    public class Body : IIndentedLogger, ISerializableJSON
     {
         public static Body ParseJSO(dynamic jso) {
             return new Body(
@@ -60,6 +60,7 @@ namespace Flounder
         public string ToString(int indent) {
             string indentText = string.Concat(Enumerable.Repeat("\t", indent));
             string text = indentText + "Body {\n";
+            text += indentText + "\tid: " + this.ID + "\n";
             text += indentText + "\tmass: " + this._mass + "\n";
             text += indentText + "\tshape: " + this._shape.ToString() + "\n";
             text += indentText + "\tposition: " + this._position + "\n";

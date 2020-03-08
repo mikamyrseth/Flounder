@@ -41,12 +41,12 @@
                 "y": 1
             },
             "acceleration": {
-                "x": 0,
-                "y": 0
+                "x": 2,
+                "y": 2
             }
         }
     ],
-    "deltaT": 0.01,
+    "deltaT": 1,
     "precission": "Nano",
     "constantForces": [
         {

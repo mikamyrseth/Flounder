@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace Flounder
 {
@@ -60,7 +61,7 @@ namespace Flounder
             for (int i = 0; i < ticks; i++) this.Tick();
         }
 
-        private void Tick() {
+        public void Tick() {
             foreach(Body body in _bodies.Values){
                 body.Tick(_deltaT);
             }
