@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Flounder
 {
-    public struct Body : IIndentedLogger, ISerializableJSON
+    public class Body : IIndentedLogger, ISerializableJSON
     {
         public static Body ParseJSO(dynamic jso) {
             return new Body(
-                (int) jso.id,
+                (string) jso.id,
                 (int) jso.mass,
                 IShape.ParseJSO(jso.shape),
                 Vector2.ParseJSO(jso.position),
@@ -20,14 +20,15 @@ namespace Flounder
 
         private readonly float _mass;
         private readonly IShape _shape;
-        private readonly Vector2 _position;
-        private readonly Vector2 _velocity;
-        private readonly Vector2 _acceleration;
+        private Vector2 _position;
+        private Vector2 _velocity;
+        private Vector2 _acceleration;
         private readonly List<ConstantForce> _forces;
 
-        public int ID { get; }
+        public string ID { get; }
 
-        public Body(int id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
+        public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
+            if (shape == null) throw new ArgumentException("Shape cannot be null");
             this.ID = id;
             this._mass = mass;
             this._shape = shape ?? throw new ArgumentException("Shape cannot be null");
@@ -37,10 +38,10 @@ namespace Flounder
             this._forces = new List<ConstantForce>();
         }
 
-        public Body(int id, float mass, IShape shape, Vector2 position) :
+        public Body(string id, float mass, IShape shape, Vector2 position) :
             this(id, mass, shape, position, new Vector2(0, 0)) { }
 
-        public Body(int id, float mass, IShape shape, Vector2 position, Vector2 velocity) :
+        public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) :
             this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
 
         public string SerializeJSON(int indent) {
@@ -59,6 +60,7 @@ namespace Flounder
         public string ToString(int indent) {
             string indentText = string.Concat(Enumerable.Repeat("\t", indent));
             string text = indentText + "Body {\n";
+            text += indentText + "\tid: " + this.ID + "\n";
             text += indentText + "\tmass: " + this._mass + "\n";
             text += indentText + "\tshape: " + this._shape.ToString() + "\n";
             text += indentText + "\tposition: " + this._position + "\n";
@@ -70,6 +72,27 @@ namespace Flounder
 
         public override string ToString() {
             return this.ToString(0);
+        }
+
+        public void addConstantForce(ConstantForce constantForce){
+            _forces.Add(constantForce);
+        }
+
+        public void Tick(float deltaT) {
+            updateAcceleraton();
+            updateVelocity(deltaT);
+        }
+
+        private void updateAcceleraton(){
+            Vector2 sigmaF = new Vector2(0, 0);
+            foreach(ConstantForce force in _forces){
+                sigmaF += force.Force;
+            }
+            _acceleration = sigmaF/_mass;
+        }
+
+        private void updateVelocity(float deltaT){
+            _velocity += deltaT * _acceleration;
         }
 
     }
