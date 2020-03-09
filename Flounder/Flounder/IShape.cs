@@ -18,7 +18,7 @@ namespace Flounder
 
         public static string SerializeJSON(string shapeName, string shapeJSON, int indent = 0, bool singleLine = false) {
             if (singleLine) {
-                return $"";
+                return $"{{ \"{shapeName}\": {shapeJSON} }}";
             } else {
                 string indentText = string.Concat(Enumerable.Repeat("\t", indent));
                 string text = "{\n";
@@ -28,7 +28,7 @@ namespace Flounder
             }
         }
 
-        new string SerializeJSON(int indent);
+        new string SerializeJSON(int indent = 0, bool singleLine = false);
 
     }
 }

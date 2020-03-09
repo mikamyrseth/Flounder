@@ -17,7 +17,7 @@ namespace Flounder
             this._radius = radius;
         }
 
-        string IShape.SerializeJSON(int indent) { return IShape.SerializeJSON(indent, "circle", this.SerializeJSON(indent + 1)); }
+        string IShape.SerializeJSON(int indent, bool singleLine) { return IShape.SerializeJSON("circle", this.SerializeJSON(indent + 1), indent, singleLine); }
 
         public string SerializeJSON(int indent = 0, bool singleLine = false) {
             if (singleLine) {

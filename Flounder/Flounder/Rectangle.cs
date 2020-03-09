@@ -21,7 +21,9 @@ namespace Flounder
             this._semiSize = semiSize;
         }
 
-        string IShape.SerializeJSON(int indent) { return IShape.SerializeJSON(indent, "rectangle", this.SerializeJSON(indent + 1)); }
+        string IShape.SerializeJSON(int indent, bool singleLine) {
+            return IShape.SerializeJSON("rectangle", this.SerializeJSON(indent + 1));
+        }
 
         public string SerializeJSON(int indent = 0, bool singleLine = false) {
             string indentText = string.Concat(Enumerable.Repeat("\t", indent));
