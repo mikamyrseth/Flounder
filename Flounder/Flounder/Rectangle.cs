@@ -22,15 +22,19 @@ namespace Flounder
         }
 
         string IShape.SerializeJSON(int indent, bool singleLine) {
-            return IShape.SerializeJSON("rectangle", this.SerializeJSON(indent + 1));
+            return IShape.SerializeJSON("rectangle", this.SerializeJSON(indent + 1, singleLine), indent, singleLine);
         }
 
         public string SerializeJSON(int indent = 0, bool singleLine = false) {
-            string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-            string text = "{\n";
-            text += indentText + $"\t\"semiSize\": {this._semiSize.SerializeJSON(indent + 1)}\n";
-            text += indentText + "}";
-            return text;
+            if (singleLine) {
+                return $"{{ \"semiSize\": {this._semiSize.SerializeJSON(singleLine: singleLine)} }}";
+            } else {
+                string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+                string text = "{\n";
+                text += indentText + $"\t\"semiSize\": {this._semiSize.SerializeJSON(indent + 1)}\n";
+                text += indentText + "}";
+                return text;
+            }
         }
 
         public string ToString(int indent) {
