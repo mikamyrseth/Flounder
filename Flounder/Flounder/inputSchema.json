@@ -46,8 +46,6 @@
             }
         }
     ],
-    "timeInterval": 1,
-    "precision": "Nano",
     "duration": 60,
     "constantForces": [
         {
@@ -60,5 +58,7 @@
                 "Frida", "Solveig", "Ingeborg"
             ]
         }
-    ]
+    ],
+    "precision": "Nano",
+    "timeInterval": 1
 }

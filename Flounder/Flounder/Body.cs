@@ -12,7 +12,6 @@ namespace Flounder
     private readonly List<ConstantForce> _forces;
 
     private readonly float _mass;
-    private readonly IShape _shape;
     private Vector2 _acceleration;
     private Vector2 _position;
     private Vector2 _velocity;
@@ -20,7 +19,7 @@ namespace Flounder
     public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
       this.ID = id;
       this._mass = mass;
-      this._shape = shape ?? throw new ArgumentException("Shape cannot be null");
+      this.Shape = shape ?? throw new ArgumentException("Shape cannot be null");
       this._position = position;
       this._velocity = velocity;
       this._acceleration = acceleration;
@@ -32,13 +31,14 @@ namespace Flounder
     public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) : this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
 
     public string ID { get; }
+    public IShape Shape { get; }
 
     public string ToString(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = indentText + "Body {\n";
       text += indentText + "\tid: " + this.ID + "\n";
       text += indentText + "\tmass: " + this._mass + "\n";
-      text += indentText + "\tshape: " + this._shape.ToString() + "\n";
+      text += indentText + "\tshape: " + this.Shape.ToString() + "\n";
       text += indentText + "\tposition: " + this._position + "\n";
       text += indentText + "\tvelocity: " + this._velocity + "\n";
       text += indentText + "\tacceleration: " + this._acceleration + "\n";
@@ -53,7 +53,7 @@ namespace Flounder
       string text = "{\n";
       text += indentText + $"\t\"id\": {this.ID.ToString(CultureInfo.InvariantCulture)},\n";
       text += indentText + $"\t\"mass\": {this._mass.ToString(CultureInfo.InvariantCulture)},\n";
-      text += indentText + $"\t\"shape\": {this._shape.SerializeJSON(indent + 1)},\n";
+      text += indentText + $"\t\"shape\": {this.Shape.SerializeJSON(indent + 1)},\n";
       text += indentText + $"\t\"position\": {this._position.SerializeJSON(indent + 1)},\n";
       text += indentText + $"\t\"velocity\": {this._velocity.SerializeJSON(indent + 1)},\n";
       text += indentText + $"\t\"acceleration\": {this._acceleration.SerializeJSON(indent + 1)}\n";

@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Newtonsoft.Json;
-
 namespace Flounder
 {
 
@@ -9,12 +7,11 @@ namespace Flounder
   {
 
     private static void Main(string[] args) {
-      string json = InputParser.FileToJson("inputSchema.json");
-      // string json = InputParser.FileToJson("C:\\Users\\leona\\Documents\\Sourcetree\\flounder\\Flounder\\Flounder\\inputSchema.json");
-      // string json = InputParser.FileToJson("Vet ikke Sol sin fillokasjon");
-      dynamic jso = JsonConvert.DeserializeObject(json);
-      Simulation simulation = Simulation.ParseJSO(jso);
-      simulation.Start();
+      if (args.Length < 2) {
+        Console.WriteLine("Input file path and output file name are required as arguments!");
+        return;
+      }
+      using Simulation simulation = new Simulation(args[0], args[1]);
       Console.WriteLine(simulation);
     }
 

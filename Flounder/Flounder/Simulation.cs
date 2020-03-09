@@ -1,29 +1,93 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Flounder
 {
 
-  public class Simulation : IIndentedLogger
+  public class Simulation : IDisposable, IIndentedLogger
   {
 
-    private readonly SortedDictionary<string, Body> _bodies = new SortedDictionary<string, Body>();
+    public enum FileFormat
+    {
+
+      FLO,
+      FLOD
+
+    }
+
+    private const string FLOFileExtension = "flo";
+    private const string FLOVersion = "flo v1.0.0";
+    private const string FLODFileExtension = "flod";
+    private const string FLODVersion = "flod v1.0.0";
+
+    private readonly SortedList<string, Body> _bodies = new SortedList<string, Body>();
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
+    private readonly FileFormat _fileFormat;
+    private readonly StreamWriter _fileWriter;
     private readonly float _timeInterval;
 
     private float _duration;
 
-    private Simulation(float timeInterval) {
-      this._timeInterval = timeInterval;
+    public Simulation(string inputFilePath, string outputFileName, FileFormat fileFormat = FileFormat.FLO) {
+      this._fileFormat = fileFormat;
+      
+      #region File setup 
+      string json = File.ReadAllText(inputFilePath);
+      string outputFilePath = outputFileName + "." + (this._fileFormat == FileFormat.FLO ? FLOFileExtension : FLODFileExtension);
+      this._fileWriter = new StreamWriter(File.Create(outputFilePath));
+      #endregion
+
+      #region Parse input
+      dynamic jso = JsonConvert.DeserializeObject(json);
+      this._duration = (float)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
+      
+      if (!Enum.TryParse(
+        (string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")),
+        true, out ImpliedFraction.PrecisionLevel precision
+      )) {
+        throw new FormatException("Precision value could not be parsed to PrecisionLevel!");
+      }
+      ImpliedFraction.Precision = precision;
+      
+      this._timeInterval = (float)(jso.timeInterval ?? throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
+
+      this.ParseBodies(jso.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected in input JSON file!"));
+      this.ParseConstantForces(jso.constantForces ?? throw new KeyNotFoundException("Key \"constantForces\" was expected in input JSON file!"));
+      #endregion
+      
+      #region Output setup
+      this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
+      this._fileWriter.WriteLine(this._bodies.Count);
+      foreach (Body body in this._bodies.Values) {
+        this._fileWriter.WriteLine(body.ID);
+      }
+      #endregion
     }
-    public Simulation(SortedDictionary<string, Body> bodies, float timeInterval, List<ConstantForce> constantForces, float duration) :
-      this(timeInterval)
-    {
-      this._bodies = bodies;
-      this._constantForces = constantForces;
-      this._duration = duration;
+
+    public void Dispose() {
+      this._fileWriter?.Dispose();
+    }
+
+    private void ParseBodies(dynamic bodiesJso) {
+      foreach (JObject bodyJSO in bodiesJso) {
+        Body body = Body.ParseJSO(bodyJSO);
+        this._bodies.Add(body.ID, body);
+      }
+    }
+
+    private void ParseConstantForces(dynamic constantForcesJso) {
+      foreach (dynamic forceJSO in constantForcesJso) {
+        ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
+        this._constantForces.Add(constantForce);
+        foreach (string bodyID in forceJSO.bodies) {
+          if (this._bodies.ContainsKey(bodyID)) { this._bodies[bodyID].AddConstantForce(constantForce); }
+        }
+      }
     }
 
     public string ToString(int indent) {
@@ -35,27 +99,6 @@ namespace Flounder
     }
 
     public override string ToString() { return this.ToString(0); }
-
-    public static Simulation ParseJSO(dynamic jso) {
-      Simulation simulation = new Simulation((float)jso.timeInterval) {
-        _duration = (float)jso.duration
-      };
-
-      foreach (JObject bodyJSO in jso.bodies) {
-        Body body = Body.ParseJSO(bodyJSO);
-        simulation._bodies.Add(body.ID, body);
-      }
-
-      foreach (dynamic forceJSO in jso.constantForces) {
-        ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
-        simulation._constantForces.Add(constantForce);
-        foreach (string bodyID in forceJSO.bodies) {
-          if (simulation._bodies.ContainsKey(bodyID)) { simulation._bodies[bodyID].AddConstantForce(constantForce); }
-        }
-      }
-
-      return simulation;
-    }
 
     public Body GetBody(string bodyID) { return this._bodies[bodyID]; }
 
