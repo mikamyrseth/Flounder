@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using Flounder;
 using Newtonsoft.Json;
 using Xunit;
@@ -18,7 +16,11 @@ namespace FlounderTest
         }
 
         private void CircleCase(float radius) {
-            string json = new Circle(radius).SerializeJSON(0);
+            this.CircleDeserializeCase(new Circle(radius).SerializeJSON(), radius);
+            this.CircleDeserializeCase(new Circle(radius).SerializeJSON(singleLine: true), radius);
+        }
+
+        private void CircleDeserializeCase(string json, float radius) {
             dynamic jso = JsonConvert.DeserializeObject(json);
             Circle circle = Flounder.Circle.ParseJSO(jso);
             Assert.Equal(radius, circle.Radius);
@@ -32,33 +34,55 @@ namespace FlounderTest
             Assert.Equal(force, constantForce.Force);
         }
 
+        private void RectangleCase(Vector2 semiSize) {
+            this.RectangleDeserializeCase(new Rectangle(semiSize).SerializeJSON(), semiSize);
+            this.RectangleDeserializeCase(new Rectangle(semiSize).SerializeJSON(singleLine: true), semiSize);
+        }
+        
         private void RectangleCase(float semiHeight, float semiWidth) {
-            string json = new Rectangle(new Vector2(semiWidth, semiHeight)).SerializeJSON(0);
+            this.RectangleCase(new Vector2(semiHeight, semiWidth));
+        }
+
+        private void RectangleDeserializeCase(string json, Vector2 semiSize) {
             dynamic jso = JsonConvert.DeserializeObject(json);
             Rectangle rectangle = Flounder.Rectangle.ParseJSO(jso);
-            Assert.Equal(semiHeight, rectangle.SemiHeight);
-            Assert.Equal(semiWidth, rectangle.SemiWidth);
+            Assert.Equal(semiSize, rectangle.SemiSize);
         }
         
         private void ShapeCircleCase(float radius) {
             IShape shape = new Circle(radius);
-            string json = shape.SerializeJSON(0);
+            this.ShapeCircleDeserializationCase(shape.SerializeJSON(), radius);
+            this.ShapeCircleDeserializationCase(shape.SerializeJSON(singleLine: true), radius);
+        }
+
+        private void ShapeCircleDeserializationCase(string json, float radius) {
             dynamic jso = JsonConvert.DeserializeObject(json);
             Circle circle = (Circle)IShape.ParseJSO(jso);
             Assert.Equal(radius, circle.Radius);
         }
 
+        private void ShapeRectangleCase(Vector2 semiSize) {
+            IShape shape = new Rectangle(semiSize);
+            this.ShapeRectangleDeserializationCase(shape.SerializeJSON(), semiSize);
+            this.ShapeRectangleDeserializationCase(shape.SerializeJSON(singleLine: true), semiSize);
+        }
+
         private void ShapeRectangleCase(float semiHeight, float semiWidth) {
-            IShape shape = new Rectangle(new Vector2(semiWidth, semiHeight));
-            string json = shape.SerializeJSON(0);
+            this.ShapeRectangleCase(new Vector2(semiWidth, semiHeight));
+        }
+
+        private void ShapeRectangleDeserializationCase(string json, Vector2 semiSize) {
             dynamic jso = JsonConvert.DeserializeObject(json);
             Rectangle rectangle = (Rectangle)IShape.ParseJSO(jso);
-            Assert.Equal(semiHeight, rectangle.SemiHeight);
-            Assert.Equal(semiWidth, rectangle.SemiWidth);
+            Assert.Equal(semiSize, rectangle.SemiSize);
         }
         
         private void Vector2Case(float x, float y) {
-            string json = new Vector2(x, y).SerializeJSON(0);
+            this.Vector2DeserializationCase(new Vector2(x, y).SerializeJSON(), x, y);
+            this.Vector2DeserializationCase(new Vector2(x, y).SerializeJSON(singleLine: true), x, y);
+        }
+
+        private void Vector2DeserializationCase(string json, float x, float y) {
             dynamic jso = JsonConvert.DeserializeObject(json);
             Vector2 vector = Flounder.Vector2.ParseJSO(jso);
             Assert.Equal(x, vector.X);
