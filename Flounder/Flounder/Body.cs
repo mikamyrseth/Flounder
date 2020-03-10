@@ -2,21 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-
 namespace Flounder
 {
-
   public class Body : IIndentedLogger, ISerializableJSON
   {
-
     private readonly List<ConstantForce> _forces;
-
     private readonly float _mass;
     private readonly IShape _shape;
     private Vector2 _acceleration;
-    private Vector2 _position;
+    private readonly Vector2 _position;
     private Vector2 _velocity;
-
     public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
       this.ID = id;
       this._mass = mass;
@@ -26,13 +21,11 @@ namespace Flounder
       this._acceleration = acceleration;
       this._forces = new List<ConstantForce>();
     }
-
-    public Body(string id, float mass, IShape shape, Vector2 position) : this(id, mass, shape, position, new Vector2(0, 0)) { }
-
-    public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) : this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
-
+    public Body(string id, float mass, IShape shape, Vector2 position) : this(id, mass, shape, position,
+      new Vector2(0, 0)) { }
+    public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) : this(id, mass, shape,
+      position, velocity, new Vector2(0, 0)) { }
     public string ID { get; }
-
     public string ToString(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = indentText + "Body {\n";
@@ -45,9 +38,9 @@ namespace Flounder
       text += indentText + "}";
       return text;
     }
-
-    public override string ToString() { return this.ToString(0); }
-
+    public override string ToString() {
+      return this.ToString(0);
+    }
     public string SerializeJSON(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
@@ -60,23 +53,26 @@ namespace Flounder
       text += indentText + "}";
       return text;
     }
-    public static Body ParseJSO(dynamic jso) { return new Body((string)jso.id, (int)jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(jso.position), Vector2.ParseJSO(jso.velocity), Vector2.ParseJSO(jso.acceleration)); }
-
-    public void AddConstantForce(ConstantForce constantForce) { this._forces.Add(constantForce); }
-
+    public static Body ParseJSO(dynamic jso) {
+      return new Body((string) jso.id, (int) jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(jso.position),
+        Vector2.ParseJSO(jso.velocity), Vector2.ParseJSO(jso.acceleration));
+    }
+    public void AddConstantForce(ConstantForce constantForce) {
+      this._forces.Add(constantForce);
+    }
     public void Tick(float timeInterval) {
       this.UpdateAcceleration();
       this.UpdateVelocity(timeInterval);
     }
-
     private void UpdateAcceleration() {
       Vector2 forceSum = new Vector2(0, 0);
-      foreach (ConstantForce force in this._forces) { forceSum += force.Force; }
+      foreach (ConstantForce force in this._forces) {
+        forceSum += force.Force;
+      }
       this._acceleration = forceSum / this._mass;
     }
-
-    private void UpdateVelocity(float timeInterval) { this._velocity += timeInterval * this._acceleration; }
-
+    private void UpdateVelocity(float timeInterval) {
+      this._velocity += timeInterval * this._acceleration;
+    }
   }
-
 }
