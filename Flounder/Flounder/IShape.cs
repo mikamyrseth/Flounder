@@ -12,13 +12,16 @@ namespace Flounder
       }
       return null;
     }
-    public static string SerializeJSON(int indent, string shapeName, string shapeJSON) {
+    public static string SerializeJSON(string shapeName, string shapeJSON, int indent = 0, bool singleLine = false) {
+      if (singleLine) {
+        return $"{{ \"{shapeName}\": {shapeJSON} }}";
+      }
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"{shapeName}\": {shapeJSON}\n";
       text += indentText + "}";
       return text;
     }
-    new string SerializeJSON(int indent);
+    new string SerializeJSON(int indent = 0, bool singleLine = false);
   }
 }

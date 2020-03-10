@@ -2,6 +2,6 @@
 {
   public interface ISerializableJSON
   {
-    string SerializeJSON(int indent);
+    string SerializeJSON(int indent = 0, bool singleLine = false);
   }
 }

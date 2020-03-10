@@ -1,4 +1,7 @@
 ﻿using System;
+
+using Newtonsoft.Json;
+
 namespace Flounder
 {
   internal class Program
