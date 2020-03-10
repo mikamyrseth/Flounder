@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-
 namespace Flounder
 {
   public static class InputParser
@@ -13,13 +12,11 @@ namespace Flounder
         streamReader = new StreamReader(fileStream);
         return streamReader.ReadToEnd();
         ;
-      }
-      catch (Exception exception) {
+      } catch (Exception exception) {
         Console.WriteLine(exception);
         Debug.WriteLine(exception);
         return null;
-      }
-      finally {
+      } finally {
         streamReader?.Close();
       }
     }

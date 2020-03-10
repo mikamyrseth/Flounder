@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Flounder
 {
   internal class Program
