@@ -72,6 +72,7 @@ namespace Flounder
     public void Tick(float timeInterval) {
       this.UpdateAcceleration();
       this.UpdateVelocity(timeInterval);
+      this.UpdatePosition(timeInterval);
     }
     private void UpdateAcceleration() {
       Vector2 forceSum = new Vector2(0, 0);
@@ -82,6 +83,9 @@ namespace Flounder
     }
     private void UpdateVelocity(float timeInterval) {
       this._velocity += timeInterval * this._acceleration;
+    }
+    private void UpdatePosition(in float timeInterval) {
+      this._position += timeInterval * this._velocity;
     }
   }
 }
