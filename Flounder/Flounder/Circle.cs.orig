@@ -11,10 +11,20 @@ namespace Flounder
     public Circle(float radius) {
       this.Radius = radius;
     }
+<<<<<<< HEAD
     string IShape.SerializeJSON(int indent) {
       return IShape.SerializeJSON(indent, "circle", this.SerializeJSON(indent + 1));
     }
     public string SerializeJSON(int indent) {
+=======
+    string IShape.SerializeJSON(int indent, bool singleLine) {
+      return IShape.SerializeJSON("circle", this.SerializeJSON(indent + 1, singleLine), indent, singleLine);
+    }
+    public string SerializeJSON(int indent = 0, bool singleLine = false) {
+      if (singleLine) {
+        return $"{{ \"radius\": {this.Radius.ToString(CultureInfo.InvariantCulture)} }}";
+      }
+>>>>>>> output-file
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"radius\": {this.Radius.ToString(CultureInfo.InvariantCulture)}\n";
@@ -23,7 +33,11 @@ namespace Flounder
     }
     public string ToString(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+<<<<<<< HEAD
       return indentText + $"Circle {{ radius: {this.Radius.ToString(CultureInfo.InvariantCulture)} }}";
+=======
+      return indentText + $"Circle {{ radius: {this.Radius} }}";
+>>>>>>> output-file
     }
     public override string ToString() {
       return this.ToString(0);
