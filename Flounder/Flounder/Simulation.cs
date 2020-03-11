@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace Flounder
     private const string FLOVersion = "flo v1.0.0";
     private const string FLODFileExtension = "flod";
     private const string FLODVersion = "flod v1.0.0";
-    private readonly SortedList<string, Body> _bodies = new SortedList<string, Body>();
+    private readonly Body[] _bodies;
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
     private readonly FileFormat _fileFormat;
     private readonly StreamWriter _fileWriter;
@@ -45,15 +46,38 @@ namespace Flounder
       ImpliedFraction.Precision = precision;
       this._timeInterval = (float) (jso.timeInterval ??
         throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
-      this.ParseBodies(jso.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected in input JSON file!"));
-      this.ParseConstantForces(jso.constantForces ??
-        throw new KeyNotFoundException("Key \"constantForces\" was expected in input JSON file!"));
+      #region Bodies
+      dynamic bodiesJso = jso.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected in input JSON file!");
+      SortedList<string, Body> bodies = new SortedList<string, Body>();
+      foreach (JObject bodyJSO in bodiesJso) {
+        Body body = Body.ParseJSO(bodyJSO);
+        bodies.Add(body.ID, body);
+      }
+      #endregion
+      #region Constant forces 
+      dynamic forcesJso = jso.constantForces ??
+        throw new KeyNotFoundException("Key \"constantForces\" was expected in input JSON file!");
+      foreach (dynamic forceJSO in forcesJso) {
+        ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
+        this._constantForces.Add(constantForce);
+        foreach (string bodyID in forceJSO.bodies) {
+          if (bodies.ContainsKey(bodyID)) {
+            bodies[bodyID].Forces.Add(constantForce);
+          }
+        }
+      }
+      #endregion
+      this._bodies = new Body[bodies.Count];
+      int i = 0;
+      foreach (Body body in bodies.Values) {
+        this._bodies[i++] = body;
+      }
       #endregion
       #region Output setup
       this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
-      this._fileWriter.WriteLine(this._bodies.Count);
-      foreach (Body body in this._bodies.Values) {
-        this._fileWriter.WriteLine(body.ID);
+      this._fileWriter.WriteLine(this._bodies.Length.ToString(CultureInfo.InvariantCulture));
+      foreach (Body body in this._bodies) {
+        this._fileWriter.WriteLine($"\"{body.ID}\", \"{body.Shape.SerializeJSON(singleLine: true)}\"");
       }
       #endregion
     }
@@ -63,7 +87,7 @@ namespace Flounder
     public string ToString(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = indentText + "Simulation { bodies: [\n";
-      foreach (Body body in this._bodies.Values) {
+      foreach (Body body in this._bodies) {
         text += indentText + body.ToString(indent + 1) + ",\n";
       }
       text += indentText + "] }";
@@ -72,34 +96,31 @@ namespace Flounder
     public override string ToString() {
       return this.ToString(0);
     }
-    private void ParseBodies(dynamic bodiesJso) {
-      foreach (JObject bodyJSO in bodiesJso) {
-        Body body = Body.ParseJSO(bodyJSO);
-        this._bodies.Add(body.ID, body);
-      }
-    }
-    private void ParseConstantForces(dynamic constantForcesJso) {
-      foreach (dynamic forceJSO in constantForcesJso) {
-        ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
-        this._constantForces.Add(constantForce);
-        foreach (string bodyID in forceJSO.bodies) {
-          if (this._bodies.ContainsKey(bodyID)) {
-            this._bodies[bodyID].AddConstantForce(constantForce);
-          }
-        }
-      }
-    }
-    public Body GetBody(string bodyID) {
-      return this._bodies[bodyID];
-    }
     public void Start() {
       while (this._duration > 0) {
         this.Tick();
       }
     }
     private void Tick() {
-      foreach (Body body in this._bodies.Values) {
-        body.Tick(this._timeInterval);
+      for (int i = 0; i < this._bodies.Length; i++) { // For every body
+        Body body = this._bodies[i];
+        Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
+        Vector2 acceleration = forceSum / body.Mass;
+        Vector2 velocity = body.Velocity + this._timeInterval * acceleration;
+        Vector2 position = body.Position + this._timeInterval * velocity;
+        body = body.SetState(position, velocity, acceleration); // Get a new body with new position
+        this._bodies[i] = body; // Switch to new body in simulation
+        switch (this._fileFormat) {
+          case FileFormat.FLO:
+            this._fileWriter.WriteLine($"\"{body.ID.ToString(CultureInfo.InvariantCulture)}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)}");
+            break;
+          case FileFormat.FLOD:
+            this._fileWriter.WriteLine(
+              $"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
+            break;
+          default:
+            throw new ArgumentOutOfRangeException();
+        }
       }
       this._duration -= this._timeInterval;
     }

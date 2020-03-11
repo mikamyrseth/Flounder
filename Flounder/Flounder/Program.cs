@@ -12,7 +12,7 @@ namespace Flounder
         return;
       }
       using Simulation simulation = new Simulation(args[0], args[1]);
-      Console.WriteLine(simulation);
+      simulation.Start();
     }
   }
 }
