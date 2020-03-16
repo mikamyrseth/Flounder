@@ -22,7 +22,7 @@ namespace Flounder
       return text;
     }
     public static ConstantForce ParseJSO(dynamic jso) {
-      return new ConstantForce((string) jso.id, Vector2.ParseJSO(jso.vector));
+      return new ConstantForce((string)jso.id, Vector2.ParseJSO(jso.vector));
     }
   }
 }

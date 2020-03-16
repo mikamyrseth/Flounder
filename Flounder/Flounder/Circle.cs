@@ -5,7 +5,7 @@ namespace Flounder
   public struct Circle : IShape
   {
     public static Circle ParseJSO(dynamic jso) {
-      return new Circle((float) jso.radius);
+      return new Circle((float)jso.radius);
     }
     public float Radius { get; }
     public Circle(float radius) {

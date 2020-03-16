@@ -12,10 +12,7 @@ namespace Flounder
     private Simulation(float timeInterval) {
       this._timeInterval = timeInterval;
     }
-    public Simulation(
-      SortedDictionary<string, Body> bodies, float timeInterval, List<ConstantForce> constantForces, float duration
-    ) :
-      this(timeInterval) {
+    public Simulation(SortedDictionary<string, Body> bodies, float timeInterval, List<ConstantForce> constantForces, float duration) : this(timeInterval) {
       this._bodies = bodies;
       this._constantForces = constantForces;
       this._duration = duration;
@@ -33,8 +30,8 @@ namespace Flounder
       return this.ToString(0);
     }
     public static Simulation ParseJSO(dynamic jso) {
-      Simulation simulation = new Simulation((float) jso.timeInterval) {
-        _duration = (float) jso.duration
+      Simulation simulation = new Simulation((float)jso.timeInterval) {
+        _duration = (float)jso.duration
       };
       foreach (JObject bodyJSO in jso.bodies) {
         Body body = Body.ParseJSO(bodyJSO);
