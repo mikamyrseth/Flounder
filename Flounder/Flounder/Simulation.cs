@@ -27,41 +27,67 @@ namespace Flounder
     private Simulation(float timeInterval) {
       this._timeInterval = timeInterval;
     }
-    public Simulation(SortedDictionary<string, Body> bodies, float timeInterval, List<ConstantForce> constantForces, float duration) : this(timeInterval) {
-      this._bodies = bodies;
-      this._constantForces = constantForces;
-      this._duration = duration;
+    public void Dispose() {
+      this._fileWriter?.Dispose();
     }
-    public string ToString(int indent) {
-      string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-      string text = indentText + "Simulation { bodies: [\n";
-      foreach (Body body in this._bodies.Values) {
-        text += indentText + body.ToString(indent + 1) + ",\n";
+    public Simulation(string inputFilePath, string outputFileName, FileFormat fileFormat = FileFormat.FLO) {
+      this._fileFormat = fileFormat;
+      #region File setup
+      string json = File.ReadAllText(inputFilePath);
+      string outputFilePath = outputFileName + "." + (this._fileFormat == FileFormat.FLO ? FLOFileExtension : FLODFileExtension);
+      this._fileWriter = new StreamWriter(File.Create(outputFilePath));
+      #endregion
+      #region Parse input
+      dynamic jso = JsonConvert.DeserializeObject(json);
+      this._duration = (float)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
+      if (!Enum.TryParse((string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")), true, out ImpliedFraction.PrecisionLevel precision)) {
+        throw new FormatException("Precision value could not be parsed to PrecisionLevel!");
       }
-      text += indentText + "] }";
-      return text;
-    }
-    public override string ToString() {
-      return this.ToString(0);
-    }
-    public static Simulation ParseJSO(dynamic jso) {
-      Simulation simulation = new Simulation((float)jso.timeInterval) {
-        _duration = (float)jso.duration
-      };
-      foreach (JObject bodyJSO in jso.bodies) {
+      ImpliedFraction.Precision = precision;
+      this._timeInterval = (float)(jso.timeInterval ?? throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
+      #region Bodies
+      dynamic bodiesJso = jso.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected in input JSON file!");
+      SortedList<string, Body> bodies = new SortedList<string, Body>();
+      foreach (JObject bodyJSO in bodiesJso) {
         Body body = Body.ParseJSO(bodyJSO);
-        simulation._bodies.Add(body.ID, body);
+        bodies.Add(body.ID, body);
       }
-      foreach (dynamic forceJSO in jso.constantForces) {
+      #endregion
+      #region Constant forces
+      dynamic forcesJso = jso.constantForces ?? throw new KeyNotFoundException("Key \"constantForces\" was expected in input JSON file!");
+      foreach (dynamic forceJSO in forcesJso) {
         ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
-        simulation._constantForces.Add(constantForce);
+        this._constantForces.Add(constantForce);
         foreach (string bodyID in forceJSO.bodies) {
-          if (simulation._bodies.ContainsKey(bodyID)) {
-            simulation._bodies[bodyID].AddConstantForce(constantForce);
+          if (bodies.ContainsKey(bodyID)) {
+            bodies[bodyID].Forces.Add(constantForce);
           }
         }
       }
-      return simulation;
+      #endregion
+      this._bodies = new Body[bodies.Count];
+      int i = 0;
+      foreach (Body body in bodies.Values) {
+        this._bodies[i++] = body;
+      }
+      #endregion
+      #region Output setup
+      this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
+      this._fileWriter.WriteLine(this._bodies.Length.ToString(CultureInfo.InvariantCulture));
+      foreach (Body body in this._bodies) {
+        switch (this._fileFormat) {
+          case FileFormat.FLO:
+            this._fileWriter.WriteLine($"# {body.ID}");
+            this._fileWriter.WriteLine(body.Shape.SerializeCSV());
+            break;
+          case FileFormat.FLOD:
+            this._fileWriter.WriteLine($"\"{body.ID}\", \"{body.Shape.SerializeJSON(singleLine: true)}\"");
+            break;
+          default:
+            throw new ArgumentOutOfRangeException();
+        }
+      }
+      #endregion
     }
     private void RecordFrame() {
       this._fileWriter.WriteLine(this._duration.ToString(CultureInfo.InvariantCulture));
