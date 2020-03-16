@@ -3,13 +3,13 @@ using System.Globalization;
 using System.Linq;
 namespace Flounder
 {
-
   public struct Rectangle : IShape
   {
-
     public static Rectangle ParseCSV(string line) {
       string[] parts = line.Split(',');
-      for (int i = 0; i < parts.Length; i++) { parts[i] = parts[i].Trim(); }
+      for (int i = 0; i < parts.Length; i++) {
+        parts[i] = parts[i].Trim();
+      }
       switch (parts.Length) {
         case 2:
           return new Rectangle(new Vector2(float.Parse(parts[0], CultureInfo.InvariantCulture), float.Parse(parts[1], CultureInfo.InvariantCulture)));
@@ -48,14 +48,14 @@ namespace Flounder
       return (header ? "Rectangle, " : "") + this.SemiSize.SerializeCSV(false);
     }
     public string SerializeJSON(int indent = 0, bool singleLine = false) {
-      if (singleLine) { return $"{{ \"semiSize\": {this._semiSize.SerializeJSON(singleLine: true)} }}"; }
+      if (singleLine) {
+        return $"{{ \"semiSize\": {this._semiSize.SerializeJSON(singleLine: true)} }}";
+      }
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"semiSize\": {this._semiSize.SerializeJSON(indent + 1)}\n";
       text += indentText + "}";
       return text;
     }
-
   }
-
 }

@@ -1,15 +1,11 @@
 using Flounder;
-
 using Newtonsoft.Json;
-
 using Xunit;
 using Xunit.Abstractions;
 namespace FlounderTest
 {
-
   public class SerializationJSON
   {
-
     public SerializationJSON(ITestOutputHelper output) {
       this._output = output;
     }
@@ -118,7 +114,5 @@ namespace FlounderTest
       this.Vector2Case(-3.14f, 5.53f);
       this.Vector2Case(-3.5f, 5.1235f);
     }
-
   }
-
 }

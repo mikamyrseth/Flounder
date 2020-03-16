@@ -3,21 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Flounder
 {
-
   public class Simulation : IDisposable
   {
-
     public enum FileFormat
     {
-
       FLO,
       FLOD
-
     }
     private const string FLOFileExtension = "flo";
     private const string FLOVersion = "flo v1.0.1";
@@ -39,7 +34,9 @@ namespace Flounder
       #region Parse input
       dynamic jso = JsonConvert.DeserializeObject(json);
       this._duration = (float)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
-      if (!Enum.TryParse((string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")), true, out ImpliedFraction.PrecisionLevel precision)) { throw new FormatException("Precision value could not be parsed to PrecisionLevel!"); }
+      if (!Enum.TryParse((string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")), true, out ImpliedFraction.PrecisionLevel precision)) {
+        throw new FormatException("Precision value could not be parsed to PrecisionLevel!");
+      }
       ImpliedFraction.Precision = precision;
       this._timeInterval = (float)(jso.timeInterval ?? throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
       #region Bodies
@@ -56,13 +53,17 @@ namespace Flounder
         ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
         this._constantForces.Add(constantForce);
         foreach (string bodyID in forceJSO.bodies) {
-          if (bodies.ContainsKey(bodyID)) { bodies[bodyID].Forces.Add(constantForce); }
+          if (bodies.ContainsKey(bodyID)) {
+            bodies[bodyID].Forces.Add(constantForce);
+          }
         }
       }
       #endregion
       this._bodies = new Body[bodies.Count];
       int i = 0;
-      foreach (Body body in bodies.Values) { this._bodies[i++] = body; }
+      foreach (Body body in bodies.Values) {
+        this._bodies[i++] = body;
+      }
       #endregion
       #region Output setup
       this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
@@ -120,7 +121,5 @@ namespace Flounder
         this._bodies[i] = body;                                 // Switch to new body in simulation
       }
     }
-
   }
-
 }

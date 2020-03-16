@@ -4,10 +4,8 @@ using System.Globalization;
 using System.Linq;
 namespace Flounder
 {
-
   public readonly struct Body : ISerializableJSON
   {
-
     public static Body ParseJSO(dynamic jso) {
       return new Body((string)jso.id, (int)jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(jso.position), Vector2.ParseJSO(jso.velocity), Vector2.ParseJSO(jso.acceleration));
     }
@@ -30,7 +28,9 @@ namespace Flounder
     public Body(string id, float mass, IShape shape, Vector2 position) : this(id, mass, shape, position, new Vector2(0, 0)) { }
     public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) : this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
     public string SerializeJSON(int indent = 0, bool singleLine = false) {
-      if (singleLine) { throw new NotImplementedException(); }
+      if (singleLine) {
+        throw new NotImplementedException();
+      }
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"id\": {this.ID.ToString(CultureInfo.InvariantCulture)},\n";
@@ -45,7 +45,5 @@ namespace Flounder
     public Body SetState(Vector2 position, Vector2 velocity, Vector2 acceleration) {
       return new Body(this.ID, this.Mass, this.Shape, position, velocity, acceleration, this.Forces);
     }
-
   }
-
 }

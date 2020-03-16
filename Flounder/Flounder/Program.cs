@@ -1,10 +1,8 @@
 ﻿using System;
 namespace Flounder
 {
-
   internal class Program
   {
-
     private static void Main(string[] args) {
       StartSimulation(args);
     }
@@ -20,7 +18,5 @@ namespace Flounder
       Console.WriteLine(Rectangle.ParseCSV("Rectangle, 0.4, 3").SerializeJSON(singleLine: true));
       Console.WriteLine(Rectangle.ParseCSV("0.4, 3").SerializeJSON(singleLine: true));
     }
-
   }
-
 }

@@ -1,20 +1,16 @@
 ﻿namespace Flounder
 {
-
   /// <summary>
   ///   Struct that represent a fraction with implied denominator. Denominator is the same for all ImpliedFractions and is
   ///   set with the static property Precision.
   /// </summary>
   public readonly struct ImpliedFraction
   {
-
     public enum PrecisionLevel
     {
-
       Micro = 20,
       Milli = 10,
       Nano = 30
-
     }
     /// <summary>
     ///   Denominator of all ImpliedFractions. Determines how accurately a number can be approximated.
@@ -43,7 +39,5 @@
     public override string ToString() {
       return $"ImpliedFraction {{ Value: {this._numerator}, Precision: {Precision} }}";
     }
-
   }
-
 }
