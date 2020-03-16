@@ -1,6 +1,27 @@
 {
     "bodies": [
         {
+            "id": "Frida",
+            "mass": 5,
+            "shape": {
+                "circle": {
+                    "radius": 1
+                }
+            },
+            "position": {
+                "x": 1,
+                "y": 1
+            },
+            "velocity": {
+                "x": 1,
+                "y": 1
+            },
+            "acceleration": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
             "id": "Solveig",
             "mass": 100,
             "shape": {
@@ -25,8 +46,6 @@
             }
         }
     ],
-    "timeInterval": 0.001,
-    "precision": "Nano",
     "duration": 1,
     "constantForces": [
         {
@@ -39,5 +58,7 @@
                 "Frida", "Solveig", "Ingeborg"
             ]
         }
-    ]
+    ],
+    "precision": "Nano",
+    "timeInterval": 0.001
 }

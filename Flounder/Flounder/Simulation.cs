@@ -1,12 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Flounder
 {
-  public class Simulation : IIndentedLogger
+  public class Simulation : IDisposable
   {
-    private readonly SortedDictionary<string, Body> _bodies = new SortedDictionary<string, Body>();
+    public enum FileFormat
+    {
+      FLO,
+      FLOD
+    }
+    private const string FLOFileExtension = "flo";
+    private const string FLOVersion = "flo v1.0.1";
+    private const string FLODFileExtension = "flod";
+    private const string FLODVersion = "flod v1.0.0";
+    private readonly Body[] _bodies;
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
+    private readonly FileFormat _fileFormat;
+    private readonly StreamWriter _fileWriter;
     private readonly float _timeInterval;
     private float _duration;
     private Simulation(float timeInterval) {
@@ -48,19 +63,40 @@ namespace Flounder
       }
       return simulation;
     }
-    public Body GetBody(string bodyID) {
-      return this._bodies[bodyID];
+    private void RecordFrame() {
+      this._fileWriter.WriteLine(this._duration.ToString(CultureInfo.InvariantCulture));
+      foreach (Body body in this._bodies) {
+        switch (this._fileFormat) {
+          case FileFormat.FLO:
+            this._fileWriter.WriteLine($"\t{body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)}");
+            break;
+          case FileFormat.FLOD:
+            this._fileWriter.WriteLine($"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
+            break;
+          default:
+            throw new ArgumentOutOfRangeException();
+        }
+      }
     }
     public void Start() {
+      this.RecordFrame();
       while (this._duration > 0) {
         this.Tick();
+        this._duration -= this._timeInterval;
+        this.RecordFrame();
       }
+      this.RecordFrame();
     }
     private void Tick() {
-      foreach (Body body in this._bodies.Values) {
-        body.Tick(this._timeInterval);
+      for (int i = 0; i < this._bodies.Length; i++) { // For every body
+        Body body = this._bodies[i];
+        Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
+        Vector2 acceleration = forceSum / body.Mass;
+        Vector2 velocity = body.Velocity + this._timeInterval * acceleration;
+        Vector2 position = body.Position + this._timeInterval * velocity;
+        body = body.SetState(position, velocity, acceleration); // Get a new body with new position
+        this._bodies[i] = body;                                 // Switch to new body in simulation
       }
-      this._duration -= this._timeInterval;
     }
   }
 }
