@@ -22,6 +22,7 @@ namespace Flounder
     private Vector2 _velocity;
     private Vector2 _acceleration;
     private readonly List<ConstantForce> _forces;
+    private readonly List<ConstantAcceleration> _constantAccelerations;
     public string ID { get; }
     public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration) {
       this.ID = id;
@@ -68,6 +69,9 @@ namespace Flounder
     }
     public void AddConstantForce(ConstantForce constantForce) {
       this._forces.Add(constantForce);
+    }
+    public void AddConstantAcceleration(ConstantAcceleration constantAcceleration){
+      this._constantAccelerations.Add(constantAcceleration);
     }
     public void Tick(float timeInterval) {
       this.UpdateAcceleration();
