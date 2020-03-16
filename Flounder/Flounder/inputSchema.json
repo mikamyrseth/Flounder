@@ -40,7 +40,7 @@
             ]
         }
     ],
-    "constantAcceleraton": [
+    "constantAccelerations": [
         {
             "id": "Gravity",
             "vector": {
