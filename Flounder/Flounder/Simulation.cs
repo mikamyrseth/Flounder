@@ -7,19 +7,13 @@ namespace Flounder
   {
     private readonly SortedDictionary<string, Body> _bodies = new SortedDictionary<string, Body>();
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
+    private readonly List<ConstantAcceleration> _constantAcceleration = new List<ConstantAcceleration>();
     private readonly float _timeInterval;
     private float _duration;
     private Simulation(float timeInterval) {
       this._timeInterval = timeInterval;
     }
-    public Simulation(
-      SortedDictionary<string, Body> bodies, float timeInterval, List<ConstantForce> constantForces, float duration
-    ) :
-      this(timeInterval) {
-      this._bodies = bodies;
-      this._constantForces = constantForces;
-      this._duration = duration;
-    }
+    
     public string ToString(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = indentText + "Simulation { bodies: [\n";
@@ -46,6 +40,15 @@ namespace Flounder
         foreach (string bodyID in forceJSO.bodies) {
           if (simulation._bodies.ContainsKey(bodyID)) {
             simulation._bodies[bodyID].AddConstantForce(constantForce);
+          }
+        }
+      }
+      foreach (dynamic accelerationJSO in jso.constantAcceleration) {
+        ConstantAcceleration constantAcceleration = ConstantAcceleration.ParseJSO(accelerationJSO);
+        simulation._constantAcceleration.Add(constantAcceleration);
+        foreach (string bodyID in accelerationJSO.bodies) {
+          if (simulation._bodies.ContainsKey(bodyID)) {
+            simulation._bodies[bodyID].AddConstantAcceleration(constantAcceleration);
           }
         }
       }
