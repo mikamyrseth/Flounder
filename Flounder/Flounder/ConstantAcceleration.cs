@@ -4,8 +4,8 @@ namespace Flounder
 {
     public class ConstantAcceleration : ISerializableJSON
     {
-        public ConstantAcceleration(string id, Vector2 accelaration) {
-            this.Acceleration = accelaration;
+        public ConstantAcceleration(string id, Vector2 acceleration) {
+            this.Acceleration = acceleration;
             this.ID = id;
         }
         public Vector2 Acceleration { get; }
