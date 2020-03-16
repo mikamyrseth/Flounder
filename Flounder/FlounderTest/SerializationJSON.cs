@@ -1,11 +1,15 @@
 using Flounder;
+
 using Newtonsoft.Json;
+
 using Xunit;
 using Xunit.Abstractions;
 namespace FlounderTest
 {
+
   public class SerializationJSON
   {
+
     public SerializationJSON(ITestOutputHelper output) {
       this._output = output;
     }
@@ -45,7 +49,7 @@ namespace FlounderTest
     }
     private void ShapeCircleDeserializationCase(string json, float radius) {
       dynamic jso = JsonConvert.DeserializeObject(json);
-      Circle circle = (Circle) IShape.ParseJSO(jso);
+      Circle circle = (Circle)IShape.ParseJSO(jso);
       Assert.Equal(radius, circle.Radius);
     }
     private void ShapeRectangleCase(Vector2 semiSize) {
@@ -58,7 +62,7 @@ namespace FlounderTest
     }
     private void ShapeRectangleDeserializationCase(string json, Vector2 semiSize) {
       dynamic jso = JsonConvert.DeserializeObject(json);
-      Rectangle rectangle = (Rectangle) IShape.ParseJSO(jso);
+      Rectangle rectangle = (Rectangle)IShape.ParseJSO(jso);
       Assert.Equal(semiSize, rectangle.SemiSize);
     }
     private void Vector2Case(float x, float y) {
@@ -114,5 +118,7 @@ namespace FlounderTest
       this.Vector2Case(-3.14f, 5.53f);
       this.Vector2Case(-3.5f, 5.1235f);
     }
+
   }
+
 }

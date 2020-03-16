@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Flounder
 {
+
   public class Simulation : IDisposable
   {
+
     public enum FileFormat
     {
+
       FLO,
       FLOD
+
     }
     private const string FLOFileExtension = "flo";
     private const string FLOVersion = "flo v1.0.1";
@@ -28,24 +33,15 @@ namespace Flounder
       this._fileFormat = fileFormat;
       #region File setup
       string json = File.ReadAllText(inputFilePath);
-      string outputFilePath = outputFileName + "." +
-        (this._fileFormat == FileFormat.FLO ? FLOFileExtension : FLODFileExtension);
+      string outputFilePath = outputFileName + "." + (this._fileFormat == FileFormat.FLO ? FLOFileExtension : FLODFileExtension);
       this._fileWriter = new StreamWriter(File.Create(outputFilePath));
       #endregion
       #region Parse input
       dynamic jso = JsonConvert.DeserializeObject(json);
-      this._duration = (float) (jso.duration ??
-        throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
-      if (!Enum.TryParse(
-        (string) (jso.precision ??
-          throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")),
-        true, out ImpliedFraction.PrecisionLevel precision
-      )) {
-        throw new FormatException("Precision value could not be parsed to PrecisionLevel!");
-      }
+      this._duration = (float)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
+      if (!Enum.TryParse((string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")), true, out ImpliedFraction.PrecisionLevel precision)) { throw new FormatException("Precision value could not be parsed to PrecisionLevel!"); }
       ImpliedFraction.Precision = precision;
-      this._timeInterval = (float) (jso.timeInterval ??
-        throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
+      this._timeInterval = (float)(jso.timeInterval ?? throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
       #region Bodies
       dynamic bodiesJso = jso.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected in input JSON file!");
       SortedList<string, Body> bodies = new SortedList<string, Body>();
@@ -54,24 +50,19 @@ namespace Flounder
         bodies.Add(body.ID, body);
       }
       #endregion
-      #region Constant forces 
-      dynamic forcesJso = jso.constantForces ??
-        throw new KeyNotFoundException("Key \"constantForces\" was expected in input JSON file!");
+      #region Constant forces
+      dynamic forcesJso = jso.constantForces ?? throw new KeyNotFoundException("Key \"constantForces\" was expected in input JSON file!");
       foreach (dynamic forceJSO in forcesJso) {
         ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
         this._constantForces.Add(constantForce);
         foreach (string bodyID in forceJSO.bodies) {
-          if (bodies.ContainsKey(bodyID)) {
-            bodies[bodyID].Forces.Add(constantForce);
-          }
+          if (bodies.ContainsKey(bodyID)) { bodies[bodyID].Forces.Add(constantForce); }
         }
       }
       #endregion
       this._bodies = new Body[bodies.Count];
       int i = 0;
-      foreach (Body body in bodies.Values) {
-        this._bodies[i++] = body;
-      }
+      foreach (Body body in bodies.Values) { this._bodies[i++] = body; }
       #endregion
       #region Output setup
       this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
@@ -102,8 +93,7 @@ namespace Flounder
             this._fileWriter.WriteLine($"\t{body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)}");
             break;
           case FileFormat.FLOD:
-            this._fileWriter.WriteLine(
-              $"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
+            this._fileWriter.WriteLine($"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
             break;
           default:
             throw new ArgumentOutOfRangeException();
@@ -127,8 +117,10 @@ namespace Flounder
         Vector2 velocity = body.Velocity + this._timeInterval * acceleration;
         Vector2 position = body.Position + this._timeInterval * velocity;
         body = body.SetState(position, velocity, acceleration); // Get a new body with new position
-        this._bodies[i] = body; // Switch to new body in simulation
+        this._bodies[i] = body;                                 // Switch to new body in simulation
       }
     }
+
   }
+
 }

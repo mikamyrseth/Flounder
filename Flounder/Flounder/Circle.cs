@@ -19,10 +19,16 @@ namespace Flounder
           throw new FormatException("Could not parse Circle from CSV!");
       }
     }
-    public static Circle ParseJSO(dynamic jso) { return new Circle((float)jso.radius); }
+    public static Circle ParseJSO(dynamic jso) {
+      return new Circle((float)jso.radius);
+    }
     public float Radius { get; }
-    public Circle(float radius) { this.Radius = radius; }
-    string IShape.SerializeJSON(int indent, bool singleLine) { return IShape.SerializeJSON("circle", this.SerializeJSON(indent + 1, singleLine), indent, singleLine); }
+    public Circle(float radius) {
+      this.Radius = radius;
+    }
+    string IShape.SerializeJSON(int indent, bool singleLine) {
+      return IShape.SerializeJSON("circle", this.SerializeJSON(indent + 1, singleLine), indent, singleLine);
+    }
     public string SerializeCSV(bool header = true) {
       return (header ? "Circle, " : "") + this.Radius.ToString(CultureInfo.InvariantCulture);
     }

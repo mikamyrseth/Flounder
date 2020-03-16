@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.IO;
 namespace Flounder
 {
+
   public static class InputParser
   {
+
     public static string FileToJson(string fileLocation) {
       StreamReader streamReader = null;
       try {
@@ -16,9 +18,9 @@ namespace Flounder
         Console.WriteLine(exception);
         Debug.WriteLine(exception);
         return null;
-      } finally {
-        streamReader?.Close();
-      }
+      } finally { streamReader?.Close(); }
     }
+
   }
+
 }
