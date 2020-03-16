@@ -16,8 +16,8 @@
                 "y": 0
             },
             "velocity": {
-                "x": 0,
-                "y": 0
+                "x": 20,
+                "y": 20
             },
             "acceleration": {
                 "x": 0,
@@ -27,16 +27,28 @@
     ],
     "timeInterval": 0.001,
     "precision": "Nano",
-    "duration": 1,
+    "duration": 8,
     "constantForces": [
         {
-            "id": "10 N nedover",
+            "id": "Solveigs G",
             "vector": {
                 "x": 0,
                 "y": -1000
             },
             "bodies": [
-                "Frida", "Solveig", "Ingeborg"
+                "Solveig"
+            ]
+        }
+    ],
+    "constantAcceleraton": [
+        {
+            "id": "Gravity",
+            "vector": {
+                "x": 0,
+                "y": -9.81
+            },
+            "bodies": [
+                "Solveig"
             ]
         }
     ]
