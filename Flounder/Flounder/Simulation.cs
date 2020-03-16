@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Flounder
 {
-  public class Simulation : IDisposable, IIndentedLogger
+  public class Simulation : IDisposable
   {
     public enum FileFormat
     {
@@ -15,7 +15,7 @@ namespace Flounder
       FLOD
     }
     private const string FLOFileExtension = "flo";
-    private const string FLOVersion = "flo v1.0.0";
+    private const string FLOVersion = "flo v1.0.1";
     private const string FLODFileExtension = "flod";
     private const string FLODVersion = "flod v1.0.0";
     private readonly Body[] _bodies;
@@ -77,29 +77,47 @@ namespace Flounder
       this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
       this._fileWriter.WriteLine(this._bodies.Length.ToString(CultureInfo.InvariantCulture));
       foreach (Body body in this._bodies) {
-        this._fileWriter.WriteLine($"\"{body.ID}\", \"{body.Shape.SerializeJSON(singleLine: true)}\"");
+        switch (this._fileFormat) {
+          case FileFormat.FLO:
+            this._fileWriter.WriteLine($"# {body.ID}");
+            this._fileWriter.WriteLine(body.Shape.SerializeCSV());
+            break;
+          case FileFormat.FLOD:
+            this._fileWriter.WriteLine($"\"{body.ID}\", \"{body.Shape.SerializeJSON(singleLine: true)}\"");
+            break;
+          default:
+            throw new ArgumentOutOfRangeException();
+        }
       }
       #endregion
     }
     public void Dispose() {
       this._fileWriter?.Dispose();
     }
-    public string ToString(int indent) {
-      string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-      string text = indentText + "Simulation { bodies: [\n";
+    private void RecordFrame() {
+      this._fileWriter.WriteLine(this._duration.ToString(CultureInfo.InvariantCulture));
       foreach (Body body in this._bodies) {
-        text += indentText + body.ToString(indent + 1) + ",\n";
+        switch (this._fileFormat) {
+          case FileFormat.FLO:
+            this._fileWriter.WriteLine($"\t{body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)}");
+            break;
+          case FileFormat.FLOD:
+            this._fileWriter.WriteLine(
+              $"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
+            break;
+          default:
+            throw new ArgumentOutOfRangeException();
+        }
       }
-      text += indentText + "] }";
-      return text;
-    }
-    public override string ToString() {
-      return this.ToString(0);
     }
     public void Start() {
+      this.RecordFrame();
       while (this._duration > 0) {
         this.Tick();
+        this._duration -= this._timeInterval;
+        this.RecordFrame();
       }
+      this.RecordFrame();
     }
     private void Tick() {
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
@@ -110,19 +128,7 @@ namespace Flounder
         Vector2 position = body.Position + this._timeInterval * velocity;
         body = body.SetState(position, velocity, acceleration); // Get a new body with new position
         this._bodies[i] = body; // Switch to new body in simulation
-        switch (this._fileFormat) {
-          case FileFormat.FLO:
-            this._fileWriter.WriteLine($"\"{body.ID.ToString(CultureInfo.InvariantCulture)}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)}");
-            break;
-          case FileFormat.FLOD:
-            this._fileWriter.WriteLine(
-              $"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
-            break;
-          default:
-            throw new ArgumentOutOfRangeException();
-        }
       }
-      this._duration -= this._timeInterval;
     }
   }
 }

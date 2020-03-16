@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 namespace Flounder
 {
-  public readonly struct Body : IIndentedLogger, ISerializableJSON
+  public readonly struct Body : ISerializableJSON
   {
     public static Body ParseJSO(dynamic jso) {
       return new Body(
@@ -55,18 +54,5 @@ namespace Flounder
     public Body SetState(Vector2 position, Vector2 velocity, Vector2 acceleration) {
       return new Body(this.ID, this.Mass, this.Shape, position, velocity, acceleration, this.Forces);
     }
-    public string ToString(int indent) {
-      string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-      string text = indentText + "Body {\n";
-      text += indentText + "\tid: " + this.ID + "\n";
-      text += indentText + "\tmass: " + this.Mass + "\n";
-      text += indentText + "\tshape: " + this.Shape.ToString() + "\n";
-      text += indentText + "\tposition: " + this.Position + "\n";
-      text += indentText + "\tvelocity: " + this.Velocity + "\n";
-      text += indentText + "\tacceleration: " + this.Acceleration + "\n";
-      text += indentText + "}";
-      return text;
-    }
-    public override string ToString() { return this.ToString(0); }
   }
 }
