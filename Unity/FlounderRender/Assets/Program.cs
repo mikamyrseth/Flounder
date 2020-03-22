@@ -3,6 +3,8 @@ using System.Globalization;
 
 using Flounder;
 
+using TMPro;
+
 using UnityEngine;
 
 namespace FlounderRender
@@ -16,16 +18,10 @@ namespace FlounderRender
     [SerializeField] private GameObject spherePrefab = null;
     [Header("Simulation")]
     [SerializeField] private new Camera camera = null;
-    [SerializeField] private string outputFilePath = "";
+    [SerializeField] private TMP_Text errorMessage = null;
+    [SerializeField] private TMP_InputField inputField = null;
 
     private Render _render;
-
-    private void Start() {
-      this._render = new Render(this.outputFilePath, this);
-      Vector2 center = this._render.Center;
-      this.camera.transform.position = new Vector3(center.x, center.y, -10);
-      this.camera.orthographicSize = this._render.Radius;
-    }
 
     public Transform CreateShape(string csvLine) {
       if (csvLine.StartsWith("Circle")) {
@@ -42,7 +38,15 @@ namespace FlounderRender
       }
       throw new ArgumentException("Could not parse line to shape!");
     }
-
+    public void LoadRender() {
+      try {
+        this.errorMessage.text = "";
+        this._render = new Render(this.inputField.text, this);
+        Vector2 center = this._render.Center;
+        this.camera.transform.position = new Vector3(center.x, center.y, -10);
+        this.camera.orthographicSize = this._render.Radius;
+      } catch (Exception exception) { this.errorMessage.text = exception.Message; }
+    }
     public Vector3 ParseVector3FromCSV(string csvLine) {
       string[] parts = csvLine.Split(',');
       for (int i = 0; i < parts.Length; i++) { parts[i] = parts[i].Trim(); }
@@ -62,8 +66,8 @@ namespace FlounderRender
           throw new FormatException("Could not parse Vector3 from CSV!");
       }
     }
-
     private void Update() {
+      if (this._render == null) { return; }
       if (Input.GetKey(KeyCode.RightArrow)) {
         this._render.NextFrame();
       }
