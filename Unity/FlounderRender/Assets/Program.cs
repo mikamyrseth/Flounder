@@ -18,34 +18,58 @@ namespace FlounderRender
     [SerializeField] private GameObject spherePrefab = null;
     [Header("Simulation")]
     [SerializeField] private new Camera camera = null;
+    [Header("User interface")]
     [SerializeField] private TMP_Text errorMessage = null;
+    [SerializeField] private TMP_Text frameNumberText = null;
     [SerializeField] private TMP_InputField inputField = null;
+    [SerializeField] private SVGImage nextFrameButton = null;
+    [SerializeField] private SVGImage pauseButton = null;
+    [SerializeField] private SVGImage playButton = null;
+    [SerializeField] private SVGImage previousFrameButton = null;
 
     private Render _render;
+    private GameObject _renderGameObject;
 
     public Transform CreateShape(string csvLine) {
+      Transform newTransform;
       if (csvLine.StartsWith("Circle")) {
         Circle circle = Circle.ParseCSV(csvLine);
-        Transform newTransform = Instantiate(this.spherePrefab).transform;
+        newTransform = Instantiate(this.spherePrefab).transform;
         newTransform.localScale = Vector3.one * circle.Radius;
-        return newTransform;
-      }
-      if (csvLine.StartsWith("Rectangle")) {
+      } else if (csvLine.StartsWith("Rectangle")) {
         Rectangle rectangle = Rectangle.ParseCSV(csvLine);
-        Transform newTransform = Instantiate(this.cubePrefab).transform;
+        newTransform = Instantiate(this.cubePrefab).transform;
         newTransform.localScale = new Vector3(rectangle.SemiSize.x, rectangle.SemiSize.y, 1);
-        return newTransform;
+      } else {
+        throw new ArgumentException("Could not parse line to shape!");
       }
-      throw new ArgumentException("Could not parse line to shape!");
+      newTransform.parent = this._renderGameObject.transform;
+      return newTransform;
     }
     public void LoadRender() {
+      Destroy(this._renderGameObject);
+      this._render = null;
+      this.errorMessage.text = "";
+      this.nextFrameButton.gameObject.SetActive(false);
+      this.previousFrameButton.gameObject.SetActive(false);
+      
       try {
-        this.errorMessage.text = "";
+        this._renderGameObject = new GameObject();
         this._render = new Render(this.inputField.text, this);
-        Vector2 center = this._render.Center;
-        this.camera.transform.position = new Vector3(center.x, center.y, -10);
-        this.camera.orthographicSize = this._render.Radius;
       } catch (Exception exception) { this.errorMessage.text = exception.Message; }
+      
+      if (this._render == null) { return; }
+      Vector2 center = this._render.Center;
+      this.camera.transform.position = new Vector3(center.x, center.y, -10);
+      this.camera.orthographicSize = this._render.Radius;
+      this.UpdateFrameNumber();
+      this.nextFrameButton.gameObject.SetActive(true);
+      this.previousFrameButton.gameObject.SetActive(true);
+    }
+    public void NextFrame() {
+      if (this._render == null) { return; }
+      this._render.NextFrame();
+      this.UpdateFrameNumber();
     }
     public Vector3 ParseVector3FromCSV(string csvLine) {
       string[] parts = csvLine.Split(',');
@@ -66,6 +90,11 @@ namespace FlounderRender
           throw new FormatException("Could not parse Vector3 from CSV!");
       }
     }
+    public void PreviousFrame() {
+      if (this._render == null) { return; }
+      this._render.PreviousFrame();
+      this.UpdateFrameNumber();
+    }
     private void Update() {
       if (this._render == null) { return; }
       if (Input.GetKey(KeyCode.RightArrow)) {
@@ -80,6 +109,10 @@ namespace FlounderRender
       if (Input.GetKeyDown(KeyCode.Comma)) {
         this._render.PreviousFrame();
       }
+    }
+    private void UpdateFrameNumber() {
+      if (this._render == null) { return; }
+      this.frameNumberText.text = $"{this._render.CurrentFrame} / {this._render.MaxFrame}";
     }
 
   }

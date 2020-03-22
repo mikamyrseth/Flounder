@@ -27,6 +27,8 @@ namespace FlounderRender
         return new Vector2((this._xBounds.x + this._xBounds.y) / 2, (this._yBounds.x + this._yBounds.y) / 2);
       }
     }
+    public int CurrentFrame { get { return this._frame + 1; } }
+    public int MaxFrame { get { return this._maxFrame + 1; } }
     public float Radius {
       get { return Mathf.Max((this._xBounds.y - this._xBounds.x) / 2, (this._yBounds.y - this._yBounds.x) / 2); }
     }
