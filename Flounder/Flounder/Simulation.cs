@@ -80,7 +80,7 @@ namespace Flounder
         ConstantAcceleration constantAcceleration = ConstantAcceleration.ParseJSO(accelerationJSO);
         this._constantAccelerations.Add(constantAcceleration);
         dynamic accelerationBodiesJSO = accelerationJSO.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected as a key in \"constantAccelerations\" in input JSON file!");
-        foreach (string bodyID in accelerationJSO.bodies) {
+        foreach (string bodyID in accelerationBodiesJSO) {
           if (bodies.ContainsKey(bodyID)) {
             bodies[bodyID].Accelerations.Add(constantAcceleration);
           }
