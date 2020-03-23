@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 namespace Flounder
@@ -20,7 +21,7 @@ namespace Flounder
       }
     }
     public static Circle ParseJSO(dynamic jso) {
-      return new Circle((float)jso.radius);
+      return new Circle((float)(jso.radius ?? throw new KeyNotFoundException("Key \"radius\" was expected in input JSON file!")));
     }
     public float Radius { get; }
     public Circle(float radius) {

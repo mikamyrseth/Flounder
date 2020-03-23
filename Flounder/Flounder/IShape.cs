@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 namespace Flounder
 {
@@ -10,7 +11,7 @@ namespace Flounder
       if (jso.rectangle != null) {
         return Rectangle.ParseJSO(jso.rectangle);
       }
-      return null;
+      throw new KeyNotFoundException("No valid shape key found in input JSON file!");
     }
     public static string SerializeJSON(string shapeName, string shapeJSON, int indent = 0, bool singleLine = false) {
       if (singleLine) {
