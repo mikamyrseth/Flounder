@@ -7,7 +7,9 @@ namespace Flounder
   public readonly struct Body : ISerializableJSON
   {
     public static Body ParseJSO(dynamic jso) {
-      return new Body((string)jso.id, (int)jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(jso.position), Vector2.ParseJSO(jso.velocity), new Vector2(0, 0));
+      dynamic velocityJSO = jso.velocity ?? throw new KeyNotFoundException("Key \"velocity\" was expected as a key in \"bodies\" in input JSON file!");
+      dynamic positionJSO = jso.position ?? throw new KeyNotFoundException("Key \"position\" was expected as a key in \"bodies\" in input JSON file!");
+      return new Body((string)jso.id, (int)jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(positionJSO), Vector2.ParseJSO(velocityJSO), new Vector2(0, 0));
     }
     public List<ConstantAcceleration> Accelerations { get; }
     public List<ConstantForce> Forces { get; }
