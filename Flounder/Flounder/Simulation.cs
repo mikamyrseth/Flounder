@@ -125,21 +125,22 @@ namespace Flounder
       }
     }
     public void Start() {
+      this.Tick(0);
       this.RecordFrame();
       while (this._duration > 0) {
-        this.Tick();
+        this.Tick(this._timeInterval);
         this._duration -= this._timeInterval;
         this.RecordFrame();
       }
       this.RecordFrame();
     }
-    private void Tick() {
+    private void Tick(float timeInterval) {
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
         Vector2 acceleration = forceSum / body.Mass;
-        Vector2 velocity = body.Velocity + this._timeInterval * acceleration;
-        Vector2 position = body.Position + this._timeInterval * velocity;
+        Vector2 velocity = body.Velocity + timeInterval * acceleration;
+        Vector2 position = body.Position + timeInterval * velocity;
         body = body.SetState(position, velocity, acceleration); // Get a new body with new position
         this._bodies[i] = body;                                 // Switch to new body in simulation
       }

@@ -7,7 +7,7 @@ namespace Flounder
   public readonly struct Body : ISerializableJSON
   {
     public static Body ParseJSO(dynamic jso) {
-      return new Body((string)jso.id, (int)jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(jso.position), Vector2.ParseJSO(jso.velocity), Vector2.ParseJSO(jso.acceleration));
+      return new Body((string)jso.id, (int)jso.mass, IShape.ParseJSO(jso.shape), Vector2.ParseJSO(jso.position), Vector2.ParseJSO(jso.velocity), new Vector2(0, 0));
     }
     public List<ConstantAcceleration> Accelerations { get; }
     public List<ConstantForce> Forces { get; }
