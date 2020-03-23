@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -20,7 +21,8 @@ namespace Flounder
       }
     }
     public static Rectangle ParseJSO(dynamic jso) {
-      return new Rectangle(Vector2.ParseJSO(jso.semiSize));
+      dynamic semiSizeJSO = jso.semiSize ?? throw new KeyNotFoundException("Key \"semiSize\" was expected as a key in \"rectangle\" in input JSON file!");
+      return new Rectangle(Vector2.ParseJSO(semiSizeJSO));
     }
     private readonly Vector2 _semiSize;
     public float Height {
