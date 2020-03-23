@@ -1,7 +1,7 @@
 {
     "bodies": [
         {
-            "id": "Frida",
+            "id": "Frode",
             "mass": 5,
             "shape": {
                 "circle": {
@@ -9,20 +9,16 @@
                 }
             },
             "position": {
-                "x": 1,
-                "y": 1
+                "x": 0,
+                "y": 0
             },
             "velocity": {
-                "x": 1,
-                "y": 1
-            },
-            "acceleration": {
                 "x": 0,
                 "y": 0
             }
         },
         {
-            "id": "Solveig",
+            "id": "Jonny",
             "mass": 100,
             "shape": {
                 "rectangle": {
@@ -37,28 +33,36 @@
                 "y": 0
             },
             "velocity": {
-                "x": 0,
-                "y": 0
-            },
-            "acceleration": {
-                "x": 0,
-                "y": 0
+                "x": 20,
+                "y": 20
             }
         }
     ],
-    "duration": 1,
     "constantForces": [
         {
-            "id": "10 N nedover",
+            "id": "Frode gets pushed",
             "vector": {
                 "x": 0,
-                "y": -1000
+                "y": 0
             },
             "bodies": [
-                "Frida", "Solveig", "Ingeborg"
+                "Frode"
             ]
         }
     ],
+    "constantAccelerations": [
+        {
+            "id": "Gravity",
+            "vector": {
+                "x": 0,
+                "y": -9.80665
+            },
+            "bodies": [
+                "Frode", "Jonny"
+            ]
+        }
+    ],
+    "duration": 2,
     "precision": "Nano",
-    "timeInterval": 0.001
+    "timeInterval": 0.01
 }

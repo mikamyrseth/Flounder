@@ -20,6 +20,7 @@ namespace Flounder
     private const string FLODVersion = "flod v1.0.0";
     private readonly Body[] _bodies;
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
+    private readonly List<ConstantAcceleration> _constantAccelerations = new List<ConstantAcceleration>();
     private readonly FileFormat _fileFormat;
     private readonly StreamWriter _fileWriter;
     private readonly float _timeInterval;
@@ -27,6 +28,16 @@ namespace Flounder
     private Simulation(float timeInterval) {
       this._timeInterval = timeInterval;
     }
+    
+    public string ToString(int indent) {
+      string indentText = string.Concat(Enumerable.Repeat("\t", indent));
+      string text = indentText + "Simulation { bodies: [\n";
+      foreach (Body body in this._bodies) {
+        text += indentText + body.SerializeJSON() + ",\n";
+      }
+      return text;
+    }
+    
     public void Dispose() {
       this._fileWriter?.Dispose();
     }
@@ -61,6 +72,16 @@ namespace Flounder
         foreach (string bodyID in forceJSO.bodies) {
           if (bodies.ContainsKey(bodyID)) {
             bodies[bodyID].Forces.Add(constantForce);
+          }
+        }
+      }
+      dynamic accelerationsJSO = jso.constantAccelerations ?? throw new KeyNotFoundException("Key \"constantAccelerations\" was expected in input JSON file!");
+      foreach (dynamic accelerationJSO in accelerationsJSO) {
+        ConstantAcceleration constantAcceleration = ConstantAcceleration.ParseJSO(accelerationJSO);
+        this._constantAccelerations.Add(constantAcceleration);
+        foreach (string bodyID in accelerationJSO.bodies) {
+          if (bodies.ContainsKey(bodyID)) {
+            bodies[bodyID].Accelerations.Add(constantAcceleration);
           }
         }
       }
@@ -105,21 +126,23 @@ namespace Flounder
       }
     }
     public void Start() {
+      this.Tick(0);
       this.RecordFrame();
       while (this._duration > 0) {
-        this.Tick();
+        this.Tick(this._timeInterval);
         this._duration -= this._timeInterval;
         this.RecordFrame();
       }
       this.RecordFrame();
     }
-    private void Tick() {
+    private void Tick(float timeInterval) {
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
         Vector2 acceleration = forceSum / body.Mass;
-        Vector2 velocity = body.Velocity + this._timeInterval * acceleration;
-        Vector2 position = body.Position + this._timeInterval * velocity;
+        acceleration += body.Accelerations.Aggregate(new Vector2(), (current, acceleration) => current + acceleration.Acceleration);
+        Vector2 velocity = body.Velocity + timeInterval * acceleration;
+        Vector2 position = body.Position + timeInterval * velocity;
         body = body.SetState(position, velocity, acceleration); // Get a new body with new position
         this._bodies[i] = body;                                 // Switch to new body in simulation
       }
