@@ -1,13 +1,13 @@
-﻿## .flo 1.0.1
-1: flo 1.0.1\
+﻿## .flo 1.0.2
+1: flo 1.0.2\
 1: (int) n // number of bodies\
 n: Shape form, shape param 1, shape param 2\
 // repeat\
-(float) frame time\
+(float) simulation time\
 n: \t(float) posX, (float) posY\
 \# lines starting with \# are comment lines that are ignored
 #### Example
-flo 1.0.1\
+flo 1.0.2\
 3, Micro\
 \# Box A\
 Rectangle, 0.2, 0.4\
@@ -23,7 +23,33 @@ Rectangle, 2, 0.4\
 &emsp;0.0, 0.4\
 0.2\
 &emsp;0.3, 0.0\
-&emsp;0.1, 0.4\
+&emsp;0.1, 0.4
+## .flo 1.0.1
+1: flo 1.0.1\
+1: (int) n // number of bodies\
+n: Shape form, shape param 1, shape param 2\
+// repeat\
+(float) remaining time\
+n: \t(float) posX, (float) posY\
+\# lines starting with \# are comment lines that are ignored
+#### Example
+flo 1.0.1\
+3, Micro\
+\# Box A\
+Rectangle, 0.2, 0.4\
+\# Box B\
+Rectangle, 2, 0.4\
+\# Frame time\
+0.2\
+\# x, y\
+&emsp;0.0, 0.0\
+&emsp;0.0, 0.4\
+0.1\
+&emsp;0.1, 0.0\
+&emsp;0.0, 0.4\
+0.0\
+&emsp;0.3, 0.0\
+&emsp;0.1, 0.4
 ## .flo 1.0.0
 First line: flo version\
 n – number of bodies, precision\

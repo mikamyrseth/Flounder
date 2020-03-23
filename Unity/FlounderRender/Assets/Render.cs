@@ -15,6 +15,7 @@ namespace FlounderRender
     private const string BodyCountFormatErrorMessage = "Could not read number of bodies in output-file!";
 
     private int _frame = 0;
+    private List<float> _frameTimes;
     private int _maxFrame = -1;
     private Program _program;
     private List<Tuple<Transform, List<Vector3>>> _positions;
@@ -42,6 +43,9 @@ namespace FlounderRender
           throw new FormatException("Expected version line!");
         }
         switch (version) {
+          case "flo v1.0.2":
+            this.ParseFLO_v1_0_2(reader);
+            break;
           case "flo v1.0.1":
             this.ParseFLO_v1_0_1(reader);
             break;
@@ -64,7 +68,7 @@ namespace FlounderRender
       this.ShowFrame(this._frame);
     }
 
-    private void ParseFLO_v1_0_1(OutputLineReader reader) {
+    private void ParseFLO_v1_0_2(OutputLineReader reader) {
       if (!reader.NextLine(out string shapeNumberLine)) {
         throw new FormatException("Expected shape number line!");
       }
@@ -80,11 +84,13 @@ namespace FlounderRender
         List<Vector3> positions = new List<Vector3>();
         this._positions.Add(new Tuple<Transform, List<Vector3>>(transform, positions));
       }
+      this._frameTimes = new List<float>();
       while (reader.NextLine(out string timeLine)) {
         if (!float.TryParse(timeLine, NumberStyles.Any, CultureInfo.InvariantCulture, out float time)) {
-          Debug.Log(timeLine);
           break;
         }
+        Debug.Log(time);
+        this._frameTimes.Add(time);
         foreach (Tuple<Transform, List<Vector3>> tuple in this._positions) {
           if (!reader.NextLine(out string positionLine)) {
             throw new FormatException("Incorrect number of position lines!");
@@ -96,6 +102,10 @@ namespace FlounderRender
         }
         ++this._maxFrame;
       }
+    }
+    
+    private void ParseFLO_v1_0_1(OutputLineReader reader) {
+      throw new NotImplementedException("Parsing of flounder output file version 1.0.1 is unsupported!");
     }
 
     private void ParseFLO_v1_0_0(OutputLineReader reader) {
@@ -110,6 +120,10 @@ namespace FlounderRender
       if (0 > this._frame - 1) { return; }
       --this._frame;
       this.ShowFrame(this._frame);
+    }
+
+    public void ShowTime() {
+      
     }
 
     public void ShowFrame(int frame) {

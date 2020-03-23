@@ -15,7 +15,7 @@ namespace Flounder
       FLOD
     }
     private const string FLOFileExtension = "flo";
-    private const string FLOVersion = "flo v1.0.1";
+    private const string FLOVersion = "flo v1.0.2";
     private const string FLODFileExtension = "flod";
     private const string FLODVersion = "flod v1.0.0";
     private readonly Body[] _bodies;
@@ -23,8 +23,9 @@ namespace Flounder
     private readonly List<ConstantAcceleration> _constantAccelerations = new List<ConstantAcceleration>();
     private readonly FileFormat _fileFormat;
     private readonly StreamWriter _fileWriter;
-    private readonly float _timeInterval;
     private float _duration;
+    private float _time;
+    private readonly float _timeInterval;
     private Simulation(float timeInterval) {
       this._timeInterval = timeInterval;
     }
@@ -51,6 +52,7 @@ namespace Flounder
       #region Parse input
       dynamic jso = JsonConvert.DeserializeObject(json);
       this._duration = (float)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
+      this._time = 0;
       if (!Enum.TryParse((string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")), true, out ImpliedFraction.PrecisionLevel precision)) {
         throw new FormatException("Precision value could not be parsed to PrecisionLevel!");
       }
@@ -113,7 +115,7 @@ namespace Flounder
       #endregion
     }
     private void RecordFrame() {
-      this._fileWriter.WriteLine(this._duration.ToString(CultureInfo.InvariantCulture));
+      this._fileWriter.WriteLine(this._time.ToString(CultureInfo.InvariantCulture));
       foreach (Body body in this._bodies) {
         switch (this._fileFormat) {
           case FileFormat.FLO:
@@ -133,9 +135,9 @@ namespace Flounder
       while (this._duration > 0) {
         this.Tick(this._timeInterval);
         this._duration -= this._timeInterval;
+        this._time += this._timeInterval;
         this.RecordFrame();
       }
-      this.RecordFrame();
     }
     private void Tick(float timeInterval) {
       for (int i = 0; i < this._bodies.Length; i++) { // For every body

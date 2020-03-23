@@ -52,16 +52,19 @@ namespace FlounderRender
       this.errorMessage.text = "";
       this.nextFrameButton.gameObject.SetActive(false);
       this.previousFrameButton.gameObject.SetActive(false);
-      
+
       try {
         this._renderGameObject = new GameObject();
         this._render = new Render(this.inputField.text, this);
-      } catch (Exception exception) { this.errorMessage.text = exception.Message; }
+      } catch (Exception exception) {
+        this.errorMessage.text = exception.Message;
+        throw;
+      }
       
       if (this._render == null) { return; }
       Vector2 center = this._render.Center;
       this.camera.transform.position = new Vector3(center.x, center.y, -10);
-      this.camera.orthographicSize = this._render.Radius;
+      this.camera.orthographicSize = this._render.Radius * 1.1f;
       this.UpdateFrameNumber();
       this.nextFrameButton.gameObject.SetActive(true);
       this.previousFrameButton.gameObject.SetActive(true);
@@ -81,6 +84,7 @@ namespace FlounderRender
             float.Parse(parts[1], CultureInfo.InvariantCulture)
           );
         case 3:
+          Debug.Log(csvLine);
           return new Vector3(
             float.Parse(parts[0], CultureInfo.InvariantCulture),
             float.Parse(parts[1], CultureInfo.InvariantCulture),
@@ -98,16 +102,18 @@ namespace FlounderRender
     private void Update() {
       if (this._render == null) { return; }
       if (Input.GetKey(KeyCode.RightArrow)) {
-        this._render.NextFrame();
+        this.NextFrame();
       }
       if (Input.GetKey(KeyCode.LeftArrow)) {
-        this._render.PreviousFrame();
+        this.PreviousFrame();
       }
       if (Input.GetKeyDown(KeyCode.Period)) {
         this._render.NextFrame();
+        this.UpdateFrameNumber();
       }
       if (Input.GetKeyDown(KeyCode.Comma)) {
         this._render.PreviousFrame();
+        this.UpdateFrameNumber();
       }
     }
     private void UpdateFrameNumber() {
