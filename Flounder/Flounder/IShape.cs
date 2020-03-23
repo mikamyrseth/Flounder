@@ -1,7 +1,7 @@
 using System.Linq;
 namespace Flounder
 {
-  public interface IShape : IIndentedLogger, ISerializableJSON
+  public interface IShape : ISerializableCSV, ISerializableJSON
   {
     public static IShape ParseJSO(dynamic jso) {
       if (jso.circle != null) {

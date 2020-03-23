@@ -23,11 +23,11 @@
       return new ImpliedFraction(a._numerator - b._numerator);
     }
     public static ImpliedFraction operator *(ImpliedFraction a, ImpliedFraction b) {
-      return new ImpliedFraction((a._numerator * b._numerator) >> (int) Precision);
+      return new ImpliedFraction((a._numerator * b._numerator) >> (int)Precision);
     }
     private readonly long _numerator;
     public double DoubleApproximation {
-      get { return this._numerator / (double) (1L << (int) Precision); }
+      get { return this._numerator / (double)(1L << (int)Precision); }
     }
     /// <summary>
     ///   Instance of ImpliedFraction

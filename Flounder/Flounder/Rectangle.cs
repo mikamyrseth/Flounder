@@ -1,10 +1,26 @@
+using System;
+using System.Globalization;
 using System.Linq;
 namespace Flounder
 {
   public struct Rectangle : IShape
   {
-    public static Rectangle ParseJSO(dynamic JSON) {
-      return new Rectangle(Vector2.ParseJSO(JSON.semiSize));
+    public static Rectangle ParseCSV(string line) {
+      string[] parts = line.Split(',');
+      for (int i = 0; i < parts.Length; i++) {
+        parts[i] = parts[i].Trim();
+      }
+      switch (parts.Length) {
+        case 2:
+          return new Rectangle(new Vector2(float.Parse(parts[0], CultureInfo.InvariantCulture), float.Parse(parts[1], CultureInfo.InvariantCulture)));
+        case 3:
+          return new Rectangle(new Vector2(float.Parse(parts[1], CultureInfo.InvariantCulture), float.Parse(parts[2], CultureInfo.InvariantCulture)));
+        default:
+          throw new FormatException("Could not parse Rectangle from CSV!");
+      }
+    }
+    public static Rectangle ParseJSO(dynamic jso) {
+      return new Rectangle(Vector2.ParseJSO(jso.semiSize));
     }
     private readonly Vector2 _semiSize;
     public float Height {
@@ -28,22 +44,18 @@ namespace Flounder
     string IShape.SerializeJSON(int indent, bool singleLine) {
       return IShape.SerializeJSON("rectangle", this.SerializeJSON(indent + 1, singleLine), indent, singleLine);
     }
+    public string SerializeCSV(bool header = true) {
+      return (header ? "Rectangle, " : "") + this.SemiSize.SerializeCSV(false);
+    }
     public string SerializeJSON(int indent = 0, bool singleLine = false) {
       if (singleLine) {
-        return $"{{ \"semiSize\": {this._semiSize.SerializeJSON(singleLine: singleLine)} }}";
+        return $"{{ \"semiSize\": {this._semiSize.SerializeJSON(singleLine: true)} }}";
       }
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"semiSize\": {this._semiSize.SerializeJSON(indent + 1)}\n";
       text += indentText + "}";
       return text;
-    }
-    public string ToString(int indent) {
-      string indentText = string.Concat(Enumerable.Repeat("\t", indent));
-      return indentText + $"Rectangle {{ semiSize: {this._semiSize} }}";
-    }
-    public override string ToString() {
-      return this.ToString(0);
     }
   }
 }

@@ -45,7 +45,7 @@ namespace FlounderTest
     }
     private void ShapeCircleDeserializationCase(string json, float radius) {
       dynamic jso = JsonConvert.DeserializeObject(json);
-      Circle circle = (Circle) IShape.ParseJSO(jso);
+      Circle circle = (Circle)IShape.ParseJSO(jso);
       Assert.Equal(radius, circle.Radius);
     }
     private void ShapeRectangleCase(Vector2 semiSize) {
@@ -58,7 +58,7 @@ namespace FlounderTest
     }
     private void ShapeRectangleDeserializationCase(string json, Vector2 semiSize) {
       dynamic jso = JsonConvert.DeserializeObject(json);
-      Rectangle rectangle = (Rectangle) IShape.ParseJSO(jso);
+      Rectangle rectangle = (Rectangle)IShape.ParseJSO(jso);
       Assert.Equal(semiSize, rectangle.SemiSize);
     }
     private void Vector2Case(float x, float y) {
