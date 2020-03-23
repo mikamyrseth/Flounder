@@ -75,7 +75,8 @@ namespace Flounder
           }
         }
       }
-      foreach (dynamic accelerationJSO in jso.constantAcceleration) {
+      dynamic accelerationsJSO = jso.constantAccelerations ?? throw new KeyNotFoundException("Key \"constantAccelerations\" was expected in input JSON file!");
+      foreach (dynamic accelerationJSO in accelerationsJSO) {
         ConstantAcceleration constantAcceleration = ConstantAcceleration.ParseJSO(accelerationJSO);
         this._constantAccelerations.Add(constantAcceleration);
         foreach (string bodyID in accelerationJSO.bodies) {
@@ -139,6 +140,7 @@ namespace Flounder
         Body body = this._bodies[i];
         Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
         Vector2 acceleration = forceSum / body.Mass;
+        acceleration += body.Accelerations.Aggregate(new Vector2(), (current, acceleration) => current + acceleration.Acceleration);
         Vector2 velocity = body.Velocity + timeInterval * acceleration;
         Vector2 position = body.Position + timeInterval * velocity;
         body = body.SetState(position, velocity, acceleration); // Get a new body with new position
