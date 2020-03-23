@@ -16,7 +16,7 @@ namespace Flounder
         using Simulation simulation = new Simulation(args[0], args[1]);
         simulation.Start();
       } catch (KeyNotFoundException exception){
-        Console.WriteLine(exception);
+        Console.WriteLine(exception.Message);
       }
     }
     private static void Test(string[] args) {
