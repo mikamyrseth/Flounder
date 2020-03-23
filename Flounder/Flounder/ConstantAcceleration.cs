@@ -23,8 +23,8 @@ namespace Flounder
             return text;
         }
         public static ConstantAcceleration ParseJSO(dynamic jso) {
-            dynamic idJSO = jso.id ?? throw new KeyNotFoundException("Key \"id\" was expected as a key in \"constantAcceleration\" in input JSON file!");
-            dynamic vectorJSO = jso.vector ?? throw new KeyNotFoundException("Key \"vector\" was expected as a key in \"constantAcceleration\" in input JSON file!");
+            dynamic idJSO = jso.id ?? throw new KeyNotFoundException("Key \"id\" was expected as a key in \"constantAccelerations\" in input JSON file!");
+            dynamic vectorJSO = jso.vector ?? throw new KeyNotFoundException("Key \"vector\" was expected as a key in \"constantAccelerations\" in input JSON file!");
             return new ConstantAcceleration((string) idJSO, Vector2.ParseJSO(vectorJSO));
         }
     }

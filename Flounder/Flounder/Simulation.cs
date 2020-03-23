@@ -69,6 +69,7 @@ namespace Flounder
       foreach (dynamic forceJSO in forcesJso) {
         ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
         this._constantForces.Add(constantForce);
+        dynamic forceBodiesJSO = forceJSO.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected as a key in \"constantForces\" in input JSON file!");
         foreach (string bodyID in forceJSO.bodies) {
           if (bodies.ContainsKey(bodyID)) {
             bodies[bodyID].Forces.Add(constantForce);
