@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using System.Linq;
 namespace Flounder
 {
@@ -22,7 +23,9 @@ namespace Flounder
       return text;
     }
     public static ConstantForce ParseJSO(dynamic jso) {
-      return new ConstantForce((string)jso.id, Vector2.ParseJSO(jso.vector));
+      dynamic idJSO = jso.id ?? throw new KeyNotFoundException("Key \"id\" was expected as a key in \"constantFroces\" in input JSON file!");
+      dynamic vectorJSO = jso.vector ?? throw new KeyNotFoundException("Key \"vector\" was expected as a key in \"constantForces\" in input JSON file!");
+      return new ConstantForce((string)idJSO, Vector2.ParseJSO(vectorJSO));
     }
   }
 }

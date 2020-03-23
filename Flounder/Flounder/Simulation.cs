@@ -69,6 +69,7 @@ namespace Flounder
       foreach (dynamic forceJSO in forcesJso) {
         ConstantForce constantForce = ConstantForce.ParseJSO(forceJSO);
         this._constantForces.Add(constantForce);
+        dynamic forceBodiesJSO = forceJSO.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected as a key in \"constantForces\" in input JSON file!");
         foreach (string bodyID in forceJSO.bodies) {
           if (bodies.ContainsKey(bodyID)) {
             bodies[bodyID].Forces.Add(constantForce);
@@ -79,7 +80,8 @@ namespace Flounder
       foreach (dynamic accelerationJSO in accelerationsJSO) {
         ConstantAcceleration constantAcceleration = ConstantAcceleration.ParseJSO(accelerationJSO);
         this._constantAccelerations.Add(constantAcceleration);
-        foreach (string bodyID in accelerationJSO.bodies) {
+        dynamic accelerationBodiesJSO = accelerationJSO.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected as a key in \"constantAccelerations\" in input JSON file!");
+        foreach (string bodyID in accelerationBodiesJSO) {
           if (bodies.ContainsKey(bodyID)) {
             bodies[bodyID].Accelerations.Add(constantAcceleration);
           }

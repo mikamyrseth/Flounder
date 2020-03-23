@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace Flounder
 {
   internal class Program
@@ -11,8 +12,12 @@ namespace Flounder
         Console.WriteLine("Input file path and output file name are required as arguments!");
         return;
       }
-      using Simulation simulation = new Simulation(args[0], args[1]);
-      simulation.Start();
+      try {
+        using Simulation simulation = new Simulation(args[0], args[1]);
+        simulation.Start();
+      } catch (KeyNotFoundException exception){
+        Console.WriteLine(exception.Message);
+      }
     }
     private static void Test(string[] args) {
       Console.WriteLine(Rectangle.ParseCSV("Rectangle, 0.4, 3").SerializeJSON(singleLine: true));
