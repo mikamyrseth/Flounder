@@ -1,11 +1,14 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 namespace Flounder
 {
   public readonly struct Vector2 : ISerializableCSV, ISerializableJSON
   {
     public static Vector2 ParseJSO(dynamic jso) {
-      return new Vector2((float)jso.x, (float)jso.y);
+      dynamic xJSO = jso.x ?? throw new KeyNotFoundException("Key \"x\" was expected as a key in \"vector\" in input JSON file!");
+      dynamic yJSO = jso.y ?? throw new KeyNotFoundException("Key \"y\" was expected as a key in \"vector\" in input JSON file!");
+      return new Vector2((float)xJSO, (float)yJSO);
     }
     public static Vector2 operator +(Vector2 a, Vector2 b) {
       return new Vector2(a.X + b.X, a.Y + b.Y);

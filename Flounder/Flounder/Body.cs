@@ -7,6 +7,7 @@ namespace Flounder
   public readonly struct Body : ISerializableJSON
   {
     public static Body ParseJSO(dynamic jso) {
+
       return new Body(
         (string)(jso.id ?? throw new KeyNotFoundException("Key \"id\" was expected in input JSON file!")), 
         (int)(jso.mass ?? throw new KeyNotFoundException("Key \"mass\" was expected in input JSON file!")),
@@ -15,6 +16,7 @@ namespace Flounder
         Vector2.ParseJSO(jso.velocity ?? throw new KeyNotFoundException("Key \"velocity\" was expected in input JSON file!")), 
         new Vector2(0, 0)
       );
+
     }
     public List<ConstantAcceleration> Accelerations { get; }
     public List<ConstantForce> Forces { get; }
