@@ -19,7 +19,7 @@ namespace FlounderRender
     private List<float> _frameTimes;
     private int _maxFrame = -1;
     private Program _program;
-    private List<Tuple<Transform, List<Vector3>>> _positions;
+    private List<RenderObject> _renderObjects;
 
     private Vector2 _xBounds;
     private Vector2 _yBounds;
@@ -64,9 +64,15 @@ namespace FlounderRender
       this.ShowFrame(0);
     }
 
-    public float NextFrame() {
-      if (this._maxFrame == this._frame) { return this._frameTimes[this._frame]; }
-      ++this._frame;
+    public float JumpFrames(int framesToJump) {
+      int newFrameNumber = this._frame + framesToJump;
+      if (newFrameNumber < 0) {
+        this._frame = 0;
+      } else if (this._maxFrame < newFrameNumber) {
+        this._frame = this._maxFrame;
+      } else {
+        this._frame = newFrameNumber;
+      }
       this.ShowFrame(this._frame);
       return this._frameTimes[this._frame];
     }
@@ -78,31 +84,36 @@ namespace FlounderRender
       if (!int.TryParse(shapeNumberLine, out int shapeNumber)) {
         throw new FormatException("Shape number line could not be parsed to an integer!");
       }
-      this._positions = new List<Tuple<Transform, List<Vector3>>>();
+      this._renderObjects = new List<RenderObject>();
       for (int i = 0; i < shapeNumber; i++) {
         if (!reader.NextLine(out string shapeLine)) {
           throw new FormatException("Expected shape line!");
         }
-        Transform transform = this._program.CreateShape(shapeLine);
-        List<Vector3> positions = new List<Vector3>();
-        this._positions.Add(new Tuple<Transform, List<Vector3>>(transform, positions));
+        this._renderObjects.Add(this._program.CreateRenderObject(shapeLine));
       }
       this._frameTimes = new List<float>();
+      List<Vector3>[] positions = new List<Vector3>[this._renderObjects.Count];
+      for (int i = 0; i < this._renderObjects.Count; i++) {
+        positions[i] = new List<Vector3>();
+      }
       while (reader.NextLine(out string timeLine)) {
         if (!float.TryParse(timeLine, NumberStyles.Any, CultureInfo.InvariantCulture, out float time)) {
           break;
         }
         this._frameTimes.Add(time);
-        foreach (Tuple<Transform, List<Vector3>> tuple in this._positions) {
+        foreach (List<Vector3> positionList in positions) {
           if (!reader.NextLine(out string positionLine)) {
             throw new FormatException("Incorrect number of position lines!");
           }
           Vector2 position = this._program.ParseVector3FromCSV(positionLine);
           this._xBounds = new Vector2(Mathf.Min(this._xBounds.x, position.x), Mathf.Max(this._xBounds.y, position.x));
           this._yBounds = new Vector2(Mathf.Min(this._yBounds.x, position.y), Mathf.Max(this._yBounds.y, position.y));
-          tuple.Item2.Add(position);
+          positionList.Add(position);
         }
         ++this._maxFrame;
+      }
+      for (int i = 0; i < this._renderObjects.Count; i++) {
+        this._renderObjects[i].AddPositions(positions[i]);
       }
     }
     
@@ -118,11 +129,16 @@ namespace FlounderRender
       throw new NotImplementedException("Parsing of flounder output debug file version 1.0.0 is unsupported!");
     }
 
-    public float PreviousFrame() {
-      if (this._frame == 0) { return this._frameTimes[0]; }
-      --this._frame;
-      this.ShowFrame(this._frame);
-      return this._frameTimes[this._frame];
+    public void SetTraceVisibility(bool isTraceVisible) {
+      foreach (RenderObject renderObject in this._renderObjects) {
+        renderObject.SetTraceVisibility(isTraceVisible);
+      }
+    }
+
+    public void SetTraceWidth(float traceWidth) {
+      foreach (RenderObject renderObject in this._renderObjects) {
+        renderObject.SetTraceWidth(traceWidth);
+      }
     }
 
     public void ShowTime(float time) {
@@ -145,9 +161,7 @@ namespace FlounderRender
 
     public void ShowFrame(int frame) {
       this._frame = frame;
-      foreach (Tuple<Transform, List<Vector3>> tuple in this._positions) {
-        tuple.Item1.position = tuple.Item2[frame];
-      }
+      foreach (RenderObject renderObject in this._renderObjects) { renderObject.ShowFrame(frame); }
     }
 
   }
