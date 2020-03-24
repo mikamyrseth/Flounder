@@ -156,7 +156,7 @@ MonoBehaviour:
     type: 3}
   camera: {fileID: 963194227}
   traceMaterial: {fileID: 2100000, guid: 7ac4998f3aaf25240b80d56171f7f16d, type: 2}
-  traceWidth: 0.25
+  traceWidth: 0.01
   errorMessage: {fileID: 801140220}
   frameNumberText: {fileID: 1861417846}
   inputField: {fileID: 1622680016}
