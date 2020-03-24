@@ -7,6 +7,7 @@ using Flounder;
 using TMPro;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FlounderRender
 {
@@ -29,6 +30,9 @@ namespace FlounderRender
     [SerializeField] private GameObject spherePrefab = null;
     [Header("Simulation")]
     [SerializeField] private new Camera camera = null;
+    [Header("Trace")]
+    [SerializeField] private Material traceMaterial = null;
+    [SerializeField] private float traceWidth = 0;
     [Header("User interface")]
     [SerializeField] private TMP_Text errorMessage = null;
     [SerializeField] private TMP_Text frameNumberText = null;
@@ -38,27 +42,52 @@ namespace FlounderRender
     [SerializeField] private SVGImage playButton = null;
     [SerializeField] private SVGImage previousFrameButton = null;
     [SerializeField] private SVGImage replayButton = null;
+    [SerializeField] private Toggle traceToggle = null;
 
     private PlayingState _playingState;
     private Render _render;
     private GameObject _renderGameObject;
     private float _time;
 
-    public Transform CreateShape(string csvLine) {
-      Transform newTransform;
+    public void JumpFrames(int framesToJump) {
+      if (this._playingState == PlayingState.NoRender) { return; }
+      this._time = this._render.JumpFrames(framesToJump);
+      switch (this._playingState) {
+        case PlayingState.Finished:
+          if (this._render.CurrentFrame != this._render.MaxFrame) { this._playingState = PlayingState.Paused; }
+          break;
+        case PlayingState.Playing:
+          break;
+        case PlayingState.Paused:
+          if (this._render.CurrentFrame == this._render.MaxFrame) { this._playingState = PlayingState.Finished; }
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+      this.UpdateVisuals();
+    }
+    public RenderObject CreateRenderObject(string csvLine) {
+      Transform shapeTransform;
       if (csvLine.StartsWith("Circle")) {
         Circle circle = Circle.ParseCSV(csvLine);
-        newTransform = Instantiate(this.spherePrefab).transform;
-        newTransform.localScale = Vector3.one * circle.Radius;
+        shapeTransform = Instantiate(this.spherePrefab).transform;
+        shapeTransform.localScale = Vector3.one * circle.Radius;
       } else if (csvLine.StartsWith("Rectangle")) {
         Rectangle rectangle = Rectangle.ParseCSV(csvLine);
-        newTransform = Instantiate(this.cubePrefab).transform;
-        newTransform.localScale = new Vector3(rectangle.SemiSize.x, rectangle.SemiSize.y, 1);
+        shapeTransform = Instantiate(this.cubePrefab).transform;
+        shapeTransform.localScale = new Vector3(rectangle.SemiSize.x, rectangle.SemiSize.y, 1);
       } else {
         throw new ArgumentException("Could not parse line to shape!");
       }
-      newTransform.parent = this._renderGameObject.transform;
-      return newTransform;
+      shapeTransform.parent = this._renderGameObject.transform;
+      
+      GameObject traceObject = new GameObject();
+      traceObject.transform.parent = this._renderGameObject.transform;
+      LineRenderer lineRender = traceObject.AddComponent<LineRenderer>();
+      lineRender.material = this.traceMaterial;
+      lineRender.startWidth = this.traceWidth;
+      
+      return new RenderObject(shapeTransform.gameObject, traceObject);
     }
     public void LoadRender() {
       this._playingState = PlayingState.NoRender;
@@ -68,11 +97,9 @@ namespace FlounderRender
       }
       this._time = 0;
       this.errorMessage.text = "";
-      this.nextFrameButton.gameObject.SetActive(false);
-      this.previousFrameButton.gameObject.SetActive(false);
 
       try {
-        this._renderGameObject = new GameObject();
+        this._renderGameObject = new GameObject { name = "Render" };
         this._render = new Render(this.inputField.text, this);
       } catch (Exception exception) {
         this.errorMessage.text = exception.Message;
@@ -81,17 +108,15 @@ namespace FlounderRender
       
       if (this._render == null) { return; }
       this._playingState = PlayingState.Paused;
+      
       Vector2 center = this._render.Center;
       this.camera.transform.position = new Vector3(center.x, center.y, -10);
       this.camera.orthographicSize = this._render.Radius * 1.1f;
-      this.UpdateVisuals();
-    }
-    public void NextFrame() {
-      if (this._playingState != PlayingState.Paused) { return; }
-      this._time = this._render.NextFrame();
-      if (this._render.CurrentFrame == this._render.MaxFrame) {
-        this._playingState = PlayingState.Finished;
-      }
+      
+      this.traceToggle.isOn = false;
+      this._render.SetTraceWidth(this.camera.orthographicSize * this.traceWidth);
+      this.UpdateTraceVisibility();
+
       this.UpdateVisuals();
     }
     public Vector3 ParseVector3FromCSV(string csvLine) {
@@ -114,21 +139,8 @@ namespace FlounderRender
           throw new FormatException("Could not parse Vector3 from CSV!");
       }
     }
-    public void PreviousFrame() {
-      switch (this._playingState) {
-        case PlayingState.NoRender:
-        case PlayingState.Playing:
-          return;
-        case PlayingState.Finished:
-          this._playingState = PlayingState.Paused;
-          break;
-        case PlayingState.Paused:
-          break;
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
-      this._time = this._render.PreviousFrame();
-      this.UpdateVisuals();
+    public void UpdateTraceVisibility() {
+      this._render.SetTraceVisibility(this.traceToggle.isOn);
     }
     public void TogglePlaying() {
       switch (this._playingState) {
@@ -154,12 +166,24 @@ namespace FlounderRender
     private void Update() {
       if (this._render == null) { return; }
       if (Input.GetKeyDown(KeyCode.Period)) {
-        this.NextFrame();
+        this.JumpFrames(1);
+      }
+      if (Input.GetKeyDown(KeyCode.RightArrow)) {
+        this.JumpFrames(5);
+      }
+      if (Input.GetKeyDown(KeyCode.L)) {
+        this.JumpFrames(10);
       }
       if (Input.GetKeyDown(KeyCode.Comma)) {
-        this.PreviousFrame();
+        this.JumpFrames(-1);
       }
-      if (Input.GetKeyDown(KeyCode.K)) {
+      if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+        this.JumpFrames(-5);
+      }
+      if (Input.GetKeyDown(KeyCode.J)) {
+        this.JumpFrames(-10);
+      }
+      if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.Space)) {
         this.TogglePlaying();
       }
       if (this._playingState == PlayingState.Playing) {
@@ -193,6 +217,7 @@ namespace FlounderRender
           this.playButton.gameObject.SetActive(false);
           this.previousFrameButton.gameObject.SetActive(true);
           this.replayButton.gameObject.SetActive(true);
+          this.traceToggle.gameObject.SetActive(true);
           break;
         case PlayingState.Paused:
           this.nextFrameButton.gameObject.SetActive(true);
@@ -200,6 +225,7 @@ namespace FlounderRender
           this.playButton.gameObject.SetActive(true);
           this.previousFrameButton.gameObject.SetActive(true);
           this.replayButton.gameObject.SetActive(false);
+          this.traceToggle.gameObject.SetActive(true);
           break;
         case PlayingState.Playing:
           this.nextFrameButton.gameObject.SetActive(false);
@@ -207,6 +233,7 @@ namespace FlounderRender
           this.playButton.gameObject.SetActive(false);
           this.previousFrameButton.gameObject.SetActive(false);
           this.replayButton.gameObject.SetActive(false);
+          this.traceToggle.gameObject.SetActive(true);
           break;
         case PlayingState.NoRender:
           this.nextFrameButton.gameObject.SetActive(false);
@@ -214,6 +241,7 @@ namespace FlounderRender
           this.playButton.gameObject.SetActive(false);
           this.previousFrameButton.gameObject.SetActive(false);
           this.replayButton.gameObject.SetActive(false);
+          this.traceToggle.gameObject.SetActive(false);
           break;
         default:
           throw new ArgumentOutOfRangeException();
