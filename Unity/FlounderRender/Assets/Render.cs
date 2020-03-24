@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 using UnityEngine;
 
@@ -30,6 +31,7 @@ namespace FlounderRender
     }
     public int CurrentFrame { get { return this._frame + 1; } }
     public int MaxFrame { get { return this._maxFrame + 1; } }
+    public float MaxTime { get { return this._frameTimes[this._frameTimes.Count - 1]; } }
     public float Radius {
       get { return Mathf.Max((this._xBounds.y - this._xBounds.x) / 2, (this._yBounds.y - this._yBounds.x) / 2); }
     }
@@ -62,10 +64,11 @@ namespace FlounderRender
       this.ShowFrame(0);
     }
 
-    public void NextFrame() {
-      if (this._maxFrame < this._frame + 1) { return; }
+    public float NextFrame() {
+      if (this._maxFrame == this._frame) { return this._frameTimes[this._frame]; }
       ++this._frame;
       this.ShowFrame(this._frame);
+      return this._frameTimes[this._frame];
     }
 
     private void ParseFLO_v1_0_2(OutputLineReader reader) {
@@ -89,7 +92,6 @@ namespace FlounderRender
         if (!float.TryParse(timeLine, NumberStyles.Any, CultureInfo.InvariantCulture, out float time)) {
           break;
         }
-        Debug.Log(time);
         this._frameTimes.Add(time);
         foreach (Tuple<Transform, List<Vector3>> tuple in this._positions) {
           if (!reader.NextLine(out string positionLine)) {
@@ -116,17 +118,33 @@ namespace FlounderRender
       throw new NotImplementedException("Parsing of flounder output debug file version 1.0.0 is unsupported!");
     }
 
-    public void PreviousFrame() {
-      if (0 > this._frame - 1) { return; }
+    public float PreviousFrame() {
+      if (this._frame == 0) { return this._frameTimes[0]; }
       --this._frame;
       this.ShowFrame(this._frame);
+      return this._frameTimes[this._frame];
     }
 
-    public void ShowTime() {
-      
+    public void ShowTime(float time) {
+      int index = this._frameTimes.BinarySearch(time);
+      if (index < 0) { index = -index - 1; }
+      if (index == this._frameTimes.Count) {
+        this.ShowFrame(this._maxFrame);
+        return;
+      }
+      if (index == 0) {
+        this.ShowFrame(0);
+        return;
+      }
+      if (this._frameTimes[index] - time < time - this._frameTimes[index - 1]) {
+        this.ShowFrame(index);
+      } else {
+        this.ShowFrame(index - 1);
+      }
     }
 
     public void ShowFrame(int frame) {
+      this._frame = frame;
       foreach (Tuple<Transform, List<Vector3>> tuple in this._positions) {
         tuple.Item1.position = tuple.Item2[frame];
       }

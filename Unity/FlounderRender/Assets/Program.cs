@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 using Flounder;
@@ -13,6 +14,16 @@ namespace FlounderRender
   public class Program : MonoBehaviour
   {
 
+    private enum PlayingState
+    {
+
+      Finished,
+      NoRender,
+      Paused,
+      Playing,
+
+    }
+
     [Header("Shapes")]
     [SerializeField] private GameObject cubePrefab = null;
     [SerializeField] private GameObject spherePrefab = null;
@@ -26,9 +37,12 @@ namespace FlounderRender
     [SerializeField] private SVGImage pauseButton = null;
     [SerializeField] private SVGImage playButton = null;
     [SerializeField] private SVGImage previousFrameButton = null;
+    [SerializeField] private SVGImage replayButton = null;
 
+    private PlayingState _playingState;
     private Render _render;
     private GameObject _renderGameObject;
+    private float _time;
 
     public Transform CreateShape(string csvLine) {
       Transform newTransform;
@@ -47,8 +61,12 @@ namespace FlounderRender
       return newTransform;
     }
     public void LoadRender() {
-      Destroy(this._renderGameObject);
+      this._playingState = PlayingState.NoRender;
       this._render = null;
+      if (this._renderGameObject != null) {
+        Destroy(this._renderGameObject);
+      }
+      this._time = 0;
       this.errorMessage.text = "";
       this.nextFrameButton.gameObject.SetActive(false);
       this.previousFrameButton.gameObject.SetActive(false);
@@ -62,17 +80,19 @@ namespace FlounderRender
       }
       
       if (this._render == null) { return; }
+      this._playingState = PlayingState.Paused;
       Vector2 center = this._render.Center;
       this.camera.transform.position = new Vector3(center.x, center.y, -10);
       this.camera.orthographicSize = this._render.Radius * 1.1f;
-      this.UpdateFrameNumber();
-      this.nextFrameButton.gameObject.SetActive(true);
-      this.previousFrameButton.gameObject.SetActive(true);
+      this.UpdateVisuals();
     }
     public void NextFrame() {
-      if (this._render == null) { return; }
-      this._render.NextFrame();
-      this.UpdateFrameNumber();
+      if (this._playingState != PlayingState.Paused) { return; }
+      this._time = this._render.NextFrame();
+      if (this._render.CurrentFrame == this._render.MaxFrame) {
+        this._playingState = PlayingState.Finished;
+      }
+      this.UpdateVisuals();
     }
     public Vector3 ParseVector3FromCSV(string csvLine) {
       string[] parts = csvLine.Split(',');
@@ -95,30 +115,117 @@ namespace FlounderRender
       }
     }
     public void PreviousFrame() {
-      if (this._render == null) { return; }
-      this._render.PreviousFrame();
-      this.UpdateFrameNumber();
+      switch (this._playingState) {
+        case PlayingState.NoRender:
+        case PlayingState.Playing:
+          return;
+        case PlayingState.Finished:
+          this._playingState = PlayingState.Paused;
+          break;
+        case PlayingState.Paused:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+      this._time = this._render.PreviousFrame();
+      this.UpdateVisuals();
+    }
+    public void TogglePlaying() {
+      switch (this._playingState) {
+        case PlayingState.Finished:
+          this._playingState = PlayingState.Playing;
+          this._time = 0;
+          this.UpdatePlaybackRow();
+          break;
+        case PlayingState.NoRender:
+          break;
+        case PlayingState.Paused:
+          this._playingState = PlayingState.Playing;
+          this.UpdatePlaybackRow();
+          break;
+        case PlayingState.Playing:
+          this._playingState = PlayingState.Paused;
+          this.UpdatePlaybackRow();
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
     }
     private void Update() {
       if (this._render == null) { return; }
-      if (Input.GetKey(KeyCode.RightArrow)) {
+      if (Input.GetKeyDown(KeyCode.Period)) {
         this.NextFrame();
       }
-      if (Input.GetKey(KeyCode.LeftArrow)) {
+      if (Input.GetKeyDown(KeyCode.Comma)) {
         this.PreviousFrame();
       }
-      if (Input.GetKeyDown(KeyCode.Period)) {
-        this._render.NextFrame();
-        this.UpdateFrameNumber();
+      if (Input.GetKeyDown(KeyCode.K)) {
+        this.TogglePlaying();
       }
-      if (Input.GetKeyDown(KeyCode.Comma)) {
-        this._render.PreviousFrame();
-        this.UpdateFrameNumber();
+      if (this._playingState == PlayingState.Playing) {
+        this._time += Time.deltaTime;
+        if (this._render.MaxTime <= this._time) {
+          this._time = this._render.MaxTime;
+          this._playingState = PlayingState.Finished;
+        }
+        this.UpdateVisuals();
       }
     }
     private void UpdateFrameNumber() {
-      if (this._render == null) { return; }
-      this.frameNumberText.text = $"{this._render.CurrentFrame} / {this._render.MaxFrame}";
+      switch (this._playingState) {
+        case PlayingState.Finished:
+        case PlayingState.Paused:
+        case PlayingState.Playing:
+          this.frameNumberText.text = $"{this._render.CurrentFrame} / {this._render.MaxFrame}";
+          break;
+        case PlayingState.NoRender:
+          this.frameNumberText.text = "";
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+    }
+    private void UpdatePlaybackRow() {
+      switch (this._playingState) {
+        case PlayingState.Finished:
+          this.nextFrameButton.gameObject.SetActive(false);
+          this.pauseButton.gameObject.SetActive(false);
+          this.playButton.gameObject.SetActive(false);
+          this.previousFrameButton.gameObject.SetActive(true);
+          this.replayButton.gameObject.SetActive(true);
+          break;
+        case PlayingState.Paused:
+          this.nextFrameButton.gameObject.SetActive(true);
+          this.pauseButton.gameObject.SetActive(false);
+          this.playButton.gameObject.SetActive(true);
+          this.previousFrameButton.gameObject.SetActive(true);
+          this.replayButton.gameObject.SetActive(false);
+          break;
+        case PlayingState.Playing:
+          this.nextFrameButton.gameObject.SetActive(false);
+          this.pauseButton.gameObject.SetActive(true);
+          this.playButton.gameObject.SetActive(false);
+          this.previousFrameButton.gameObject.SetActive(false);
+          this.replayButton.gameObject.SetActive(false);
+          break;
+        case PlayingState.NoRender:
+          this.nextFrameButton.gameObject.SetActive(false);
+          this.pauseButton.gameObject.SetActive(false);
+          this.playButton.gameObject.SetActive(false);
+          this.previousFrameButton.gameObject.SetActive(false);
+          this.replayButton.gameObject.SetActive(false);
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+    }
+    private void UpdateRender() {
+      this._render.ShowTime(this._time);
+    }
+    private void UpdateVisuals() {
+      this.UpdateFrameNumber();
+      this.UpdatePlaybackRow();
+      this.UpdateRender();
     }
 
   }
