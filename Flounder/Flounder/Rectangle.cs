@@ -28,6 +28,9 @@ namespace Flounder
     public float Height {
       get { return 2 * this.SemiHeight; }
     }
+    public Vector2 AxisAlignedSize {
+      get { return this.Size; }
+    }
     public float SemiHeight {
       get { return this._semiSize.Y; }
     }
@@ -36,6 +39,9 @@ namespace Flounder
     }
     public float SemiWidth {
       get { return this._semiSize.X; }
+    }
+    public Vector2 Size {
+      get { return 2 * this.SemiSize; }
     }
     public float Width {
       get { return 2 * this.SemiWidth; }
