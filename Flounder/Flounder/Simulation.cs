@@ -140,6 +140,8 @@ namespace Flounder
       }
     }
     private void Tick(float timeInterval) {
+      List<BoundingBox> boundingBoxes = new List<BoundingBox>();
+      Dictionary<string, (Vector2, Vector2, Vector2)> futureState = new Dictionary<string, (Vector2, Vector2, Vector2)>();
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
@@ -147,8 +149,38 @@ namespace Flounder
         acceleration += body.Accelerations.Aggregate(new Vector2(), (current, acceleration) => current + acceleration.Acceleration);
         Vector2 velocity = body.Velocity + timeInterval * acceleration;
         Vector2 position = body.Position + timeInterval * velocity;
-        body = body.SetState(position, velocity, acceleration); // Get a new body with new position
-        this._bodies[i] = body;                                 // Switch to new body in simulation
+        futureState.Add(body.ID, (position, velocity, acceleration)); // Get a new body with new position 
+        Vector2 axisAlignedSizeBefore = body.Shape.AxisAlignedSize;
+        float minXBefore = body.Position.X - axisAlignedSizeBefore.X / 2;
+        float minYBefore = body.Position.Y - axisAlignedSizeBefore.Y / 2;
+        float maxXBefore = body.Position.X + axisAlignedSizeBefore.X / 2;
+        float maxYBefore = body.Position.Y + axisAlignedSizeBefore.Y / 2;
+        body = body.SetState(position, velocity, acceleration);
+        Vector2 axisAlignedSizeLater = body.Shape.AxisAlignedSize;
+        float minXLater = body.Position.X - axisAlignedSizeLater.X / 2;
+        float minYLater = body.Position.Y - axisAlignedSizeLater.Y / 2;
+        float maxXLater = body.Position.X + axisAlignedSizeLater.X / 2;
+        float maxYLater = body.Position.Y + axisAlignedSizeLater.Y / 2;
+        float minX = Math.Min(minXBefore, minXLater);
+        float minY = Math.Min(minYBefore, minYLater);
+        float maxX = Math.Max(maxXBefore, maxXLater);
+        float maxY = Math.Max(maxXBefore, maxXLater);
+        float sizeX = maxX - minX;
+        float sizeY = maxY - minY;
+        boundingBoxes.Add(new BoundingBox(body, new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
+      }
+      for (int i = 0; i < boundingBoxes.Count; i++) { 
+        BoundingBox boundingBox1 = boundingBoxes[i];
+        for (int j = i + 1; j < boundingBoxes.Count; j++) {
+          
+        }
+        
+      }
+      for (int i = 0; i < this._bodies.Length; i++) { 
+        Body body = this._bodies[i];
+        (Vector2, Vector2, Vector2) newState = futureState[body.ID];
+        body = body.SetState(newState.Item1, newState.Item2, newState.Item3);
+        this._bodies[i] = body;
       }
     }
     private void Collision(Body body1, Body body2){
