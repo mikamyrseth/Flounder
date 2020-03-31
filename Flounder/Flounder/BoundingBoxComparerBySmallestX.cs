@@ -9,6 +9,7 @@ namespace Flounder
       MinX,
       MinY,
     }
-    public List<>
+    public List<BoundingBoxAttribute> sortOrder;
+    
   }
 }

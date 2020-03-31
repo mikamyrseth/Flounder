@@ -13,18 +13,18 @@
                 "y": 0
             },
             "velocity": {
-                "x": 0,
-                "y": 0
+                "x": 20,
+                "y": 20
             }
         },
         {
-            "id": "Jonny",
+            "id": "Car",
             "mass": 100,
             "shape": {
                 "rectangle": {
                     "semiSize": {
-                        "x": 1,
-                        "y": 1
+                        "x": 2,
+                        "y": 1.5
                     }
                 }
             },
@@ -32,15 +32,15 @@
                 "x": 0,
                 "y": 0
             },
-            "velocityy": {
-                "x": 20,
-                "y": 20
+            "velocity": {
+                "x": 0,
+                "y": 0
             }
         }
     ],
     "constantForces": [
         {
-            "id": "Frode gets pushed",
+            "id": "Empty force",
             "vector": {
                 "x": 0,
                 "y": 0
@@ -58,11 +58,21 @@
                 "y": -9.80665
             },
             "bodies": [
-                "Frode", "Jonny"
+                "Frode", "Sebastian"
+            ]
+        },
+        {
+            "id": "Car going fast!",
+            "vector": {
+                "x": -10,
+                "y": 0
+            },
+            "bodies": [
+                "Frode"
             ]
         }
     ],
-    "duration": 2,
+    "duration": 4,
     "precision": "Nano",
     "timeInterval": 0.01
 }
