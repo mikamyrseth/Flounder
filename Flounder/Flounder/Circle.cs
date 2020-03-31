@@ -23,6 +23,9 @@ namespace Flounder
     public static Circle ParseJSO(dynamic jso) {
       return new Circle((float)(jso.radius ?? throw new KeyNotFoundException("Key \"radius\" was expected in input JSON file!")));
     }
+    public Vector2 AxisAlignedSize {
+      get { return new Vector2(2 * this.Radius, 2 * this.Radius); }
+    }
     public float Radius { get; }
     public Circle(float radius) {
       this.Radius = radius;
