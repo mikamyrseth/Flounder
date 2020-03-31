@@ -151,5 +151,17 @@ namespace Flounder
         this._bodies[i] = body;                                 // Switch to new body in simulation
       }
     }
+    private void Collision(Body body1, Body body2){
+      Vector2 v_a1 = body1.Velocity;
+      Vector2 v_b1 = body2.Velocity;
+      float m_a = body1.Mass;
+      float m_b = body2.Mass;
+
+      Vector2 v_a2 = (((2 * m_a) * v_a1) - (m_a * v_b1) + (m_b * v_b1)) / (m_a + m_b);
+      Vector2 v_b2 = ((m_a * v_a1) - (m_b * v_a1) + ((2 * m_b) * v_b1)) / (m_a + m_b);
+      
+      body1.SetState(body1.Position, v_a2, body1.Acceleration);
+      body2.SetState(body2.Position, v_b2, body2.Acceleration);
+    }
   }
 }
