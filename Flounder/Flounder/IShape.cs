@@ -4,7 +4,7 @@ namespace Flounder
 {
   public interface IShape : ISerializableCSV, ISerializableJSON
   {
-    public Vector2 AxisAlignedSize { get; };
+    public Vector2 AxisAlignedSize { get; }
     public static IShape ParseJSO(dynamic jso) {
       if (jso.circle != null) {
         return Circle.ParseJSO(jso.circle);

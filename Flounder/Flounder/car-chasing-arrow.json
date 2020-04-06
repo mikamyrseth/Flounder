@@ -1,0 +1,78 @@
+{
+    "bodies": [
+        {
+            "id": "Frode",
+            "mass": 5,
+            "shape": {
+                "circle": {
+                    "radius": 1
+                }
+            },
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "velocity": {
+                "x": 20,
+                "y": 20
+            }
+        },
+        {
+            "id": "Car",
+            "mass": 100,
+            "shape": {
+                "rectangle": {
+                    "semiSize": {
+                        "x": 2,
+                        "y": 1.5
+                    }
+                }
+            },
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "velocity": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    ],
+    "constantForces": [
+        {
+            "id": "Empty force",
+            "vector": {
+                "x": 0,
+                "y": 0
+            },
+            "bodies": [
+                "Frode"
+            ]
+        }
+    ],
+    "constantAccelerations": [
+        {
+            "id": "Gravity",
+            "vector": {
+                "x": 0,
+                "y": -9.80665
+            },
+            "bodies": [
+                "Frode", "Sebastian"
+            ]
+        },
+        {
+            "id": "Car going fast!",
+            "vector": {
+                "x": 10,
+                "y": 0
+            },
+            "bodies": [
+                "Car"
+            ]
+        }
+    ],
+    "duration": 5,
+    "precision": "Nano",
+    "timeInterval": 0.001
+}

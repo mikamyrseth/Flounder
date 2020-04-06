@@ -17,7 +17,16 @@ namespace Flounder
     }
 
     public int Compare(BoundingBox a, BoundingBox b) {
-      return a.MinX.CompareTo(b.MinX);
+      if(a.MinX == b.MinX && a.MaxX == b.MaxX){
+        return a.Body.ID.CompareTo(b.Body.ID);
+      }
+      else if(a.MinX == b.MinX) {
+        return a.MaxX.CompareTo(b.MaxX);
+      }
+      else return a.MinX.CompareTo(b.MinX);
+      
+      
+      // Greier
       foreach (BoundingBoxAttribute attribute in this.sortOrder) {
         switch (attribute) {
           case BoundingBoxAttribute.BodyID:

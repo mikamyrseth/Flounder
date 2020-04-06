@@ -167,6 +167,7 @@ namespace Flounder
         float maxY = Math.Max(maxXBefore, maxXLater);
         float sizeX = maxX - minX;
         float sizeY = maxY - minY;
+        // TODO: Insert so it's sorted
         boundingBoxes.Add(new BoundingBox(body, new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
       }
       for (int i = 0; i < boundingBoxes.Count; i++) {
@@ -183,12 +184,25 @@ namespace Flounder
             }
           } else if (boundingBoxes[j].MinX < boundingBoxes[i].MinX) {
             if (boundingBoxes[i].MinY <= boundingBoxes[j].MaxY) {
-              checkForCollision = true;
+              checkForCollision = true; 
             }
           } else {
-            checkForCollision = true;
+            checkForCollision = true; 
           }
 
+          bool isColliding;
+          float collisionTime;
+          if (checkForCollision) {
+            isColliding = CheckCollision(boundingBoxes[i].Body, boundingBoxes[j].Body, out collisionTime);
+            if (isColliding){
+              Body body1 = boundingBoxes[i].Body;
+              Body body2 = boundingBoxes[j].Body;
+              Collision(ref body1, ref body2);
+              futureState[body1.ID] = (body1.Position, body1.Velocity, body1.Acceleration);
+              futureState[body2.ID] = (body2.Position, body2.Velocity, body2.Acceleration);
+
+            }
+          }
           // (
           //   (-x_{2s} + x_1) (x_{2f} - x_{2s}) + (-y_{2s} + y_1) (y_{2f} - y_{2s})
           //   - sqrt(r² ( (x_{2f} - x_{2s})² + (y_{2f} - y_{2s})²) -(x_{2f} y_{2s} - x_{2f} y_1 - y_{2s} x_1 + y_1 x_{2s} + x_1 y_{2f} - x_{2s} y_{2f})²)
@@ -203,17 +217,26 @@ namespace Flounder
         this._bodies[i] = body;
       }
     }
-    private void Collision(Body body1, Body body2){
-      Vector2 v_a1 = body1.Velocity;
-      Vector2 v_b1 = body2.Velocity;
-      float m_a = body1.Mass;
-      float m_b = body2.Mass;
+    private bool CheckCollision(Body body1, Body body2, out float collisionTime){
+      Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
+      collisionTime = -1;
+      return true;
+    }
+    private void Collision(ref Body body1, ref Body body2){
+      Console.WriteLine("Ohhh buy. Yup it's a collision :((");
+      Vector2 v_1s = body1.Velocity; // Start velocity
+      Vector2 v_2s = body2.Velocity;
+      float m_1 = body1.Mass;
+      float m_2 = body2.Mass;
+      // 
 
-      Vector2 v_a2 = (((2 * m_a) * v_a1) - (m_a * v_b1) + (m_b * v_b1)) / (m_a + m_b);
-      Vector2 v_b2 = ((m_a * v_a1) - (m_b * v_a1) + ((2 * m_b) * v_b1)) / (m_a + m_b);
+      Vector2 v_1f = (m_1*v_1s - m_2*v_1s + 2*m_2*v_2s)/(m_1+m_2);
+      //(((2 * m_a) * v_a1) - (m_a * v_b1) + (m_b * v_b1)) / (m_a + m_b);
+      Vector2 v_2f = (2*m_1*v_1s - m_1*v_2s + m_2*v_2s)/(m_1+m_2);
+      //((m_a * v_a1) - (m_b * v_a1) + ((2 * m_b) * v_b1)) / (m_a + m_b);
       
-      body1.SetState(body1.Position, v_a2, body1.Acceleration);
-      body2.SetState(body2.Position, v_b2, body2.Acceleration);
+      body1 = body1.SetState(body1.Position, v_1f, body1.Acceleration);
+      body2 = body2.SetState(body2.Position, v_2f, body2.Acceleration);
     }
   }
 }
