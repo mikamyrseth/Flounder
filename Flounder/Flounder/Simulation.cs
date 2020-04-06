@@ -169,10 +169,30 @@ namespace Flounder
         float sizeY = maxY - minY;
         boundingBoxes.Add(new BoundingBox(body, new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
       }
-      for (int i = 0; i < boundingBoxes.Count; i++) { 
+      for (int i = 0; i < boundingBoxes.Count; i++) {
         BoundingBox boundingBox1 = boundingBoxes[i];
-        for (int j = i + 1; j < boundingBoxes.Count; j++) {
-          
+        for (
+          int j = i + 1;
+          j < boundingBoxes.Count && boundingBoxes[j].MinX <= boundingBoxes[i].MaxX; 
+          j++
+        ) {
+          bool checkForCollision = false;
+          if (boundingBoxes[i].MinY < boundingBoxes[j].MinY) {
+            if (boundingBoxes[j].MinY <= boundingBoxes[i].MaxY) {
+              checkForCollision = true;
+            }
+          } else if (boundingBoxes[j].MinX < boundingBoxes[i].MinX) {
+            if (boundingBoxes[i].MinY <= boundingBoxes[j].MaxY) {
+              checkForCollision = true;
+            }
+          } else {
+            checkForCollision = true;
+          }
+
+          // (
+          //   (-x_{2s} + x_1) (x_{2f} - x_{2s}) + (-y_{2s} + y_1) (y_{2f} - y_{2s})
+          //   - sqrt(r² ( (x_{2f} - x_{2s})² + (y_{2f} - y_{2s})²) -(x_{2f} y_{2s} - x_{2f} y_1 - y_{2s} x_1 + y_1 x_{2s} + x_1 y_{2f} - x_{2s} y_{2f})²)
+          // ) * T / ((x_{2f} - x_{2s})² (y_{2f} - y_{2s})²)
         }
         
       }
