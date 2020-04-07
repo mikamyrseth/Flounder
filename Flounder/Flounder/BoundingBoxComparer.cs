@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 namespace Flounder
@@ -10,18 +11,18 @@ namespace Flounder
       MinX,
       MinY,
     }
-    private List<BoundingBoxAttribute> sortOrder;
+    private List<BoundingBoxAttribute> _sortOrder;
 
     public BoundingBoxComparer(params BoundingBoxAttribute[] attributes) {
-      this.sortOrder = new List<BoundingBoxAttribute>(attributes);
+      this._sortOrder = new List<BoundingBoxAttribute>(attributes);
     }
 
     public int Compare(BoundingBox a, BoundingBox b) {
-      foreach (BoundingBoxAttribute attribute in this.sortOrder) {
+      foreach (BoundingBoxAttribute attribute in this._sortOrder) {
         switch (attribute) {
           case BoundingBoxAttribute.BodyID:
             if(a.Body.ID != b.Body.ID){
-              return a.Body.ID.CompareTo(b.Body.ID);
+              return string.Compare(a.Body.ID, b.Body.ID, StringComparison.InvariantCulture);
             }
             break;
           case BoundingBoxAttribute.MaxX:
@@ -44,6 +45,8 @@ namespace Flounder
               return a.MinY.CompareTo(b.MinY);
             }
             break;
+          default:
+            throw new ArgumentOutOfRangeException();
         }
       }
       return 0;
