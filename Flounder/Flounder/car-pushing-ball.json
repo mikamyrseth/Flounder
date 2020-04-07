@@ -1,0 +1,68 @@
+{
+    "bodies": [
+        {
+            "id": "Ball",
+            "mass": 10,
+            "shape": {
+                "circle": {
+                    "radius": 1
+                }
+            },
+            "position": {
+                "x": 5,
+                "y": 0
+            },
+            "velocity": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "id": "Car",
+            "mass": 50,
+            "shape": {
+                "rectangle": {
+                    "semiSize": {
+                        "x": 1.5,
+                        "y": 1
+                    }
+                }
+            },
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "velocity": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    ],
+    "constantForces": [
+        {
+            "id": "Engine",
+            "vector": {
+                "x": 250,
+                "y": 0
+            },
+            "bodies":[
+                "Car"
+            ] 
+        }
+    ],
+    "constantAccelerations": [
+        {
+            "id": "Gravity",
+            "vector": {
+                "x": 0,
+                "y": -9.80665
+            },
+            "bodies": [
+                ""
+            ]
+        }
+    ],
+    "duration": 5,
+    "precision": "Nano",
+    "timeInterval": 0.0011
+}
