@@ -1,4 +1,32 @@
-﻿## .flo 1.0.2
+﻿## .flo 1.0.3
+1: flo 1.0.3\
+1: precision // either Milli, Micro, Nano\
+1: (int) n // number of bodies\
+n: Shape form, shape param 1, shape param 2\
+// repeat\
+(dumber) simulation time\
+n: \t(dumber) posX, (dumber) posY\
+\# lines starting with \# are comment lines that are ignored
+#### Example
+flo 1.0.3\
+Micro\
+3\
+\# Box A\
+Rectangle, 10000, 10000\
+\# Box B\
+Rectangle, 10000, 20000\
+\# Frame time\
+0\
+\# x, y\
+&emsp;0, 0\
+&emsp;10000, 10000\
+100\
+&emsp;1000, 0\
+&emsp;10000, 9000\
+200\
+&emsp;1500, 0\
+&emsp;10000, 8000
+## .flo 1.0.2
 1: flo 1.0.2\
 1: (int) n // number of bodies\
 n: Shape form, shape param 1, shape param 2\
@@ -8,7 +36,7 @@ n: \t(float) posX, (float) posY\
 \# lines starting with \# are comment lines that are ignored
 #### Example
 flo 1.0.2\
-3, Micro\
+3\
 \# Box A\
 Rectangle, 0.2, 0.4\
 \# Box B\
@@ -34,7 +62,7 @@ n: \t(float) posX, (float) posY\
 \# lines starting with \# are comment lines that are ignored
 #### Example
 flo 1.0.1\
-3, Micro\
+3\
 \# Box A\
 Rectangle, 0.2, 0.4\
 \# Box B\
@@ -76,7 +104,7 @@ m * n lines: id, posX, posY, veloX, veloY, accX, accY\
 \# lines starting with \# are comment lines that are ignored
 #### Example
 flod 1.0.0\
-3, Nano\
+3\
 "box1", { rectangle: { semiSize: { x: 1024, y: 1024 } } }\
 "box2", { rectangle: { semiSize: { x: 2048, y: 1024 } } }\
 "ball", { circle: { radius: 4096 } }\

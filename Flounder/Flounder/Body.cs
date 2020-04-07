@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Dumber = Flounder.ImpliedFraction;
 namespace Flounder
 {
   public readonly struct Body : ISerializableJSON
@@ -10,24 +11,24 @@ namespace Flounder
 
       return new Body(
         (string)(jso.id ?? throw new KeyNotFoundException("Key \"id\" was expected in input JSON file!")), 
-        (int)(jso.mass ?? throw new KeyNotFoundException("Key \"mass\" was expected in input JSON file!")),
+        Dumber.Parse((string)(jso.mass ?? throw new KeyNotFoundException("Key \"mass\" was expected in input JSON file!"))),
         IShape.ParseJSO(jso.shape ?? throw new KeyNotFoundException("Key \"shape\" was expected in input JSON file!")), 
         Vector2.ParseJSO(jso.position ?? throw new KeyNotFoundException("Key \"position\" was expected in input JSON file!")), 
         Vector2.ParseJSO(jso.velocity ?? throw new KeyNotFoundException("Key \"velocity\" was expected in input JSON file!")), 
-        new Vector2(0, 0)
+        Vector2.Zero
       );
 
     }
     public List<ConstantAcceleration> Accelerations { get; }
     public List<ConstantForce> Forces { get; }
     public string ID { get; }
-    public float Mass { get; }
+    public Dumber Mass { get; }
     public Vector2 Position { get; }
     public IShape Shape { get; }
     public Vector2 Velocity { get; }
     public Vector2 Acceleration { get; }
 
-    public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration, List<ConstantAcceleration> accelerations = null, List<ConstantForce> forces = null) {
+    public Body(string id, Dumber mass, IShape shape, Vector2 position, Vector2 velocity, Vector2 acceleration, List<ConstantAcceleration> accelerations = null, List<ConstantForce> forces = null) {
       this.ID = id;
       this.Mass = mass;
       this.Shape = shape ?? throw new ArgumentException("Shape cannot be null");
@@ -35,7 +36,7 @@ namespace Flounder
       this.Velocity = velocity;
       this.Accelerations = accelerations ?? new List<ConstantAcceleration>();
       this.Forces = forces ?? new List<ConstantForce>();
-      this.Acceleration = new Vector2(0,0);
+      this.Acceleration = acceleration;
     }
     //public Body(string id, float mass, IShape shape, Vector2 position) : this(id, mass, shape, position, new Vector2(0, 0)) { }
     //public Body(string id, float mass, IShape shape, Vector2 position, Vector2 velocity) : this(id, mass, shape, position, velocity, new Vector2(0, 0)) { }
@@ -46,7 +47,7 @@ namespace Flounder
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
       string text = "{\n";
       text += indentText + $"\t\"id\": {this.ID.ToString(CultureInfo.InvariantCulture)},\n";
-      text += indentText + $"\t\"mass\": {this.Mass.ToString(CultureInfo.InvariantCulture)},\n";
+      text += indentText + $"\t\"mass\": {this.Mass},\n";
       text += indentText + $"\t\"shape\": {this.Shape.SerializeJSON(indent + 1)},\n";
       text += indentText + $"\t\"position\": {this.Position.SerializeJSON(indent + 1)},\n";
       text += indentText + $"\t\"velocity\": {this.Velocity.SerializeJSON(indent + 1)},\n";

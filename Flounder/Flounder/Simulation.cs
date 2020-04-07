@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Dumber = Flounder.ImpliedFraction;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Flounder
@@ -15,7 +16,7 @@ namespace Flounder
       FLOD
     }
     private const string FLOFileExtension = "flo";
-    private const string FLOVersion = "flo v1.0.2";
+    private const string FLOVersion = "flo v1.0.3";
     private const string FLODFileExtension = "flod";
     private const string FLODVersion = "flod v1.0.0";
     private readonly Body[] _bodies;
@@ -23,12 +24,9 @@ namespace Flounder
     private readonly List<ConstantAcceleration> _constantAccelerations = new List<ConstantAcceleration>();
     private readonly FileFormat _fileFormat;
     private readonly StreamWriter _fileWriter;
-    private float _duration;
-    private float _time;
-    private readonly float _timeInterval;
-    private Simulation(float timeInterval) {
-      this._timeInterval = timeInterval;
-    }
+    private Dumber _duration;
+    private Dumber _time;
+    private readonly Dumber _timeInterval;
     
     public string ToString(int indent) {
       string indentText = string.Concat(Enumerable.Repeat("\t", indent));
@@ -43,6 +41,9 @@ namespace Flounder
       this._fileWriter?.Dispose();
     }
     public Simulation(string inputFilePath, string outputFileName, FileFormat fileFormat = FileFormat.FLO) {
+      if (fileFormat == FileFormat.FLOD) {
+        throw new NotImplementedException("Writing Flounder Output Debug files – .flod-files – is not supported!");
+      }
       this._fileFormat = fileFormat;
       #region File setup
       string json = File.ReadAllText(inputFilePath);
@@ -51,13 +52,13 @@ namespace Flounder
       #endregion
       #region Parse input
       dynamic jso = JsonConvert.DeserializeObject(json);
-      this._duration = (float)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!"));
-      this._time = 0;
+      this._duration = Dumber.Parse((string)(jso.duration ?? throw new KeyNotFoundException("Key \"duration\" was expected in input JSON file!")));
+      this._time = new Dumber(0);
       if (!Enum.TryParse((string)(jso.precision ?? throw new KeyNotFoundException("Key \"precision\" was expected in input JSON file!")), true, out ImpliedFraction.PrecisionLevel precision)) {
         throw new FormatException("Precision value could not be parsed to PrecisionLevel!");
       }
       ImpliedFraction.Precision = precision;
-      this._timeInterval = (float)(jso.timeInterval ?? throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!"));
+      this._timeInterval = Dumber.Parse((string)(jso.timeInterval ?? throw new KeyNotFoundException("Key \"timeInterval\" was expected in input JSON file!")));
       #region Bodies
       dynamic bodiesJso = jso.bodies ?? throw new KeyNotFoundException("Key \"bodies\" was expected in input JSON file!");
       SortedList<string, Body> bodies = new SortedList<string, Body>();
@@ -98,6 +99,7 @@ namespace Flounder
       #endregion
       #region Output setup
       this._fileWriter.WriteLine(this._fileFormat == FileFormat.FLO ? FLOVersion : FLODVersion);
+      this._fileWriter.WriteLine(precision);
       this._fileWriter.WriteLine(this._bodies.Length.ToString(CultureInfo.InvariantCulture));
       foreach (Body body in this._bodies) {
         switch (this._fileFormat) {
@@ -115,14 +117,15 @@ namespace Flounder
       #endregion
     }
     private void RecordFrame() {
-      this._fileWriter.WriteLine(this._time.ToString(CultureInfo.InvariantCulture));
+      this._fileWriter.WriteLine("# " + this._time.DoubleApproximation.ToString(CultureInfo.InvariantCulture));
+      this._fileWriter.WriteLine(this._time.SerializeJSON());
       foreach (Body body in this._bodies) {
         switch (this._fileFormat) {
           case FileFormat.FLO:
-            this._fileWriter.WriteLine($"\t{body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)}");
+            this._fileWriter.WriteLine($"\t{body.Position.X.SerializeJSON()}, {body.Position.Y.SerializeJSON()}");
             break;
           case FileFormat.FLOD:
-            this._fileWriter.WriteLine($"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
+            // this._fileWriter.WriteLine($"\"{body.ID}\", {body.Position.X.ToString(CultureInfo.InvariantCulture)}, {body.Position.Y.ToString(CultureInfo.InvariantCulture)},  {body.Velocity.X.ToString(CultureInfo.InvariantCulture)}, {body.Velocity.Y.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.X.ToString(CultureInfo.InvariantCulture)}, {body.Acceleration.Y.ToString(CultureInfo.InvariantCulture)}");
             break;
           default:
             throw new ArgumentOutOfRangeException();
@@ -130,16 +133,17 @@ namespace Flounder
       }
     }
     public void Start() {
-      this.Tick(0);
+      this.Tick(new Dumber(0));
       this.RecordFrame();
-      while (this._duration > 0) {
+      Dumber end = new Dumber(0);
+      while (this._duration > end) {
         this.Tick(this._timeInterval);
         this._duration -= this._timeInterval;
         this._time += this._timeInterval;
         this.RecordFrame();
       }
     }
-    private void Tick(float timeInterval) {
+    private void Tick(Dumber timeInterval) {
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);

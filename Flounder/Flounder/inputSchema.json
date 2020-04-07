@@ -2,39 +2,39 @@
     "bodies": [
         {
             "id": "Frode",
-            "mass": 5,
+            "mass": "5",
             "shape": {
                 "circle": {
-                    "radius": 1
+                    "radius": "1"
                 }
             },
             "position": {
-                "x": 0,
-                "y": 0
+                "x": "0",
+                "y": "0"
             },
             "velocity": {
-                "x": 0,
-                "y": 0
+                "x": "0",
+                "y": "0"
             }
         },
         {
             "id": "Jonny",
-            "mass": 100,
+            "mass": "100",
             "shape": {
                 "rectangle": {
                     "semiSize": {
-                        "x": 1,
-                        "y": 1
+                        "x": "1",
+                        "y": "1"
                     }
                 }
             },
             "position": {
-                "x": 0,
-                "y": 0
+                "x": "0",
+                "y": "0"
             },
-            "velocityy": {
-                "x": 20,
-                "y": 20
+            "velocity": {
+                "x": "20",
+                "y": "20"
             }
         }
     ],
@@ -42,8 +42,8 @@
         {
             "id": "Frode gets pushed",
             "vector": {
-                "x": 0,
-                "y": 0
+                "x": "0",
+                "y": "0"
             },
             "bodies": [
                 "Frode"
@@ -54,15 +54,15 @@
         {
             "id": "Gravity",
             "vector": {
-                "x": 0,
-                "y": -9.80665
+                "x": "0",
+                "y": "-9.80665"
             },
             "bodies": [
                 "Frode", "Jonny"
             ]
         }
     ],
-    "duration": 2,
+    "duration": "2",
     "precision": "Nano",
-    "timeInterval": 0.01
+    "timeInterval": "0.01"
 }
