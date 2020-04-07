@@ -170,6 +170,14 @@ namespace Flounder
         // TODO: Insert so it's sorted
         boundingBoxes.Add(new BoundingBox(body, new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
       }
+      boundingBoxes.Sort(new BoundingBoxComparer(
+        BoundingBoxComparer.BoundingBoxAttribute.MinX,
+        BoundingBoxComparer.BoundingBoxAttribute.MaxX,
+        BoundingBoxComparer.BoundingBoxAttribute.BodyID
+      ));
+      float lowestCollisionTime = timeInterval;
+      Body collidingBody1 = new Body();
+      Body collidingBody2 = new Body();
       for (int i = 0; i < boundingBoxes.Count; i++) {
         BoundingBox boundingBox1 = boundingBoxes[i];
         for (
@@ -182,7 +190,7 @@ namespace Flounder
             if (boundingBoxes[j].MinY <= boundingBoxes[i].MaxY) {
               checkForCollision = true;
             }
-          } else if (boundingBoxes[j].MinX < boundingBoxes[i].MinX) {
+          } else if (boundingBoxes[j].MinY < boundingBoxes[i].MinY) {
             if (boundingBoxes[i].MinY <= boundingBoxes[j].MaxY) {
               checkForCollision = true; 
             }
@@ -197,10 +205,17 @@ namespace Flounder
             if (isColliding){
               Body body1 = boundingBoxes[i].Body;
               Body body2 = boundingBoxes[j].Body;
+
+              if(collisionTime < lowestCollisionTime){
+                lowestCollisionTime = collisionTime;
+                collidingBody1 = body1;
+                collidingBody2 = body2;
+              }
+              /*
               Collision(ref body1, ref body2);
               futureState[body1.ID] = (body1.Position, body1.Velocity, body1.Acceleration);
               futureState[body2.ID] = (body2.Position, body2.Velocity, body2.Acceleration);
-
+              */
             }
           }
           // (
@@ -210,7 +225,26 @@ namespace Flounder
         }
         
       }
-      for (int i = 0; i < this._bodies.Length; i++) { 
+
+      if(lowestCollisionTime != timeInterval){
+        Tick(lowestCollisionTime * 0.90f);
+        Body body1 = collidingBody1;
+        Body body2 = collidingBody2;
+        Collision(ref body1, ref body2);
+        futureState[body1.ID] = (body1.Position, body1.Velocity, body1.Acceleration);
+        futureState[body2.ID] = (body2.Position, body2.Velocity, body2.Acceleration);
+        for (int i = 0; i < this._bodies.Length; i++) {
+          if (_bodies[i].ID == body1.ID) {
+            _bodies[i] = _bodies[i].SetVelocity(body1.Velocity);
+          }
+          if (_bodies[i].ID == body2.ID) {
+            _bodies[i] = _bodies[i].SetVelocity(body2.Velocity);
+          }
+        }
+        return;
+      }
+
+      for (int i = 0; i < this._bodies.Length; i++) {
         Body body = this._bodies[i];
         (Vector2, Vector2, Vector2) newState = futureState[body.ID];
         body = body.SetState(newState.Item1, newState.Item2, newState.Item3);
@@ -219,21 +253,18 @@ namespace Flounder
     }
     private bool CheckCollision(Body body1, Body body2, out float collisionTime){
       Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
-      collisionTime = -1;
+      collisionTime = 0;
       return true;
     }
     private void Collision(ref Body body1, ref Body body2){
-      Console.WriteLine("Ohhh buy. Yup it's a collision :((");
+      //Console.WriteLine("Ohhh boy. Yup it's a collision :((");
       Vector2 v_1s = body1.Velocity; // Start velocity
       Vector2 v_2s = body2.Velocity;
       float m_1 = body1.Mass;
       float m_2 = body2.Mass;
-      // 
 
       Vector2 v_1f = (m_1*v_1s - m_2*v_1s + 2*m_2*v_2s)/(m_1+m_2);
-      //(((2 * m_a) * v_a1) - (m_a * v_b1) + (m_b * v_b1)) / (m_a + m_b);
       Vector2 v_2f = (2*m_1*v_1s - m_1*v_2s + m_2*v_2s)/(m_1+m_2);
-      //((m_a * v_a1) - (m_b * v_a1) + ((2 * m_b) * v_b1)) / (m_a + m_b);
       
       body1 = body1.SetState(body1.Position, v_1f, body1.Acceleration);
       body2 = body2.SetState(body2.Position, v_2f, body2.Acceleration);

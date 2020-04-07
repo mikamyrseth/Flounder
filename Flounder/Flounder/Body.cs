@@ -57,5 +57,9 @@ namespace Flounder
     public Body SetState(Vector2 position, Vector2 velocity, Vector2 acceleration) {
       return new Body(this.ID, this.Mass, this.Shape, position, velocity, acceleration, this.Accelerations, this.Forces);
     }
+
+    public Body SetVelocity(Vector2 velocity){
+      return new Body(this.ID, this.Mass, this.Shape, this.Position, velocity, this.Acceleration, this.Accelerations, this.Forces);
+    }
   }
 }
