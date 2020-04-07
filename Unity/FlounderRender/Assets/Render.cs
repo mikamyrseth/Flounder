@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
+using Flounder;
+
 using UnityEngine;
 
 namespace FlounderRender
@@ -45,6 +47,9 @@ namespace FlounderRender
           throw new FormatException("Expected version line!");
         }
         switch (version) {
+          case "flo v1.0.3":
+            this.ParseFLO_v1_0_3(reader);
+            break;
           case "flo v1.0.2":
             this.ParseFLO_v1_0_2(reader);
             break;
@@ -75,6 +80,56 @@ namespace FlounderRender
       }
       this.ShowFrame(this._frame);
       return this._frameTimes[this._frame];
+    }
+
+    private void ParseFLO_v1_0_3(OutputLineReader reader) {
+      if (!reader.NextLine(out string precisionLine)) {
+        throw new FormatException("Expected precision line!");
+      }
+      if (!Enum.TryParse(precisionLine, true, out ImpliedFraction.PrecisionLevel precision)) {
+        ImpliedFraction.Precision = precision;
+      }
+      if (!reader.NextLine(out string shapeNumberLine)) {
+        throw new FormatException("Expected shape number line!");
+      }
+      if (!int.TryParse(shapeNumberLine, out int shapeNumber)) {
+        throw new FormatException("Shape number line could not be parsed to an integer!");
+      }
+      this._renderObjects = new List<RenderObject>();
+      for (int i = 0; i < shapeNumber; i++) {
+        if (!reader.NextLine(out string shapeLine)) {
+          throw new FormatException("Expected shape line!");
+        }
+        this._renderObjects.Add(this._program.CreateRenderObject(shapeLine));
+      }
+      this._frameTimes = new List<float>();
+      List<Vector3>[] positions = new List<Vector3>[this._renderObjects.Count];
+      for (int i = 0; i < this._renderObjects.Count; i++) {
+        positions[i] = new List<Vector3>();
+      }
+      while (reader.NextLine(out string timeLine)) {
+        if (!long.TryParse(timeLine, out long timeNumerator)) {
+          break;
+        }
+        this._frameTimes.Add(new ImpliedFraction(timeNumerator).FloatApproximation);
+        foreach (List<Vector3> positionList in positions) {
+          if (!reader.NextLine(out string positionLine)) {
+            throw new FormatException("Incorrect number of position lines!");
+          }
+          string[] parts = positionLine.Split(',');
+          Vector2 position = new Vector2(
+            new ImpliedFraction(long.Parse(parts[0])).FloatApproximation, 
+            new ImpliedFraction(long.Parse(parts[1])).FloatApproximation
+          );
+          this._xBounds = new Vector2(Mathf.Min(this._xBounds.x, position.x), Mathf.Max(this._xBounds.y, position.x));
+          this._yBounds = new Vector2(Mathf.Min(this._yBounds.x, position.y), Mathf.Max(this._yBounds.y, position.y));
+          positionList.Add(position);
+        }
+        ++this._maxFrame;
+      }
+      for (int i = 0; i < this._renderObjects.Count; i++) {
+        this._renderObjects[i].AddPositions(positions[i]);
+      }
     }
 
     private void ParseFLO_v1_0_2(OutputLineReader reader) {

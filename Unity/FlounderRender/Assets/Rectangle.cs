@@ -14,13 +14,13 @@ namespace Flounder
       switch (parts.Length) {
         case 2:
           return new Rectangle(new Vector2(
-            float.Parse(parts[0], CultureInfo.InvariantCulture), 
-            float.Parse(parts[1], CultureInfo.InvariantCulture)
+            new ImpliedFraction(long.Parse(parts[0], CultureInfo.InvariantCulture)).FloatApproximation,
+            new ImpliedFraction(long.Parse(parts[1], CultureInfo.InvariantCulture)).FloatApproximation
           ));
         case 3:
           return new Rectangle(new Vector2(
-            float.Parse(parts[1], CultureInfo.InvariantCulture), 
-            float.Parse(parts[2], CultureInfo.InvariantCulture)
+            new ImpliedFraction(long.Parse(parts[1], CultureInfo.InvariantCulture)).FloatApproximation,
+            new ImpliedFraction(long.Parse(parts[2], CultureInfo.InvariantCulture)).FloatApproximation
           ));
         default:
           throw new FormatException("Could not parse Rectangle from CSV!");
