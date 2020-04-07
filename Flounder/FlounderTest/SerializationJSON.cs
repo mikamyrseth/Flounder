@@ -1,4 +1,6 @@
+/*
 using Flounder;
+using Dumber = Flounder.ImpliedFraction;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,11 +12,11 @@ namespace FlounderTest
       this._output = output;
     }
     private readonly ITestOutputHelper _output;
-    private void CircleCase(float radius) {
+    private void CircleCase(Dumber radius) {
       this.CircleDeserializeCase(new Circle(radius).SerializeJSON(), radius);
       this.CircleDeserializeCase(new Circle(radius).SerializeJSON(singleLine: true), radius);
     }
-    private void CircleDeserializeCase(string json, float radius) {
+    private void CircleDeserializeCase(string json, Dumber radius) {
       dynamic jso = JsonConvert.DeserializeObject(json);
       Circle circle = Flounder.Circle.ParseJSO(jso);
       Assert.Equal(radius, circle.Radius);
@@ -30,7 +32,7 @@ namespace FlounderTest
       this.RectangleDeserializeCase(new Rectangle(semiSize).SerializeJSON(), semiSize);
       this.RectangleDeserializeCase(new Rectangle(semiSize).SerializeJSON(singleLine: true), semiSize);
     }
-    private void RectangleCase(float semiHeight, float semiWidth) {
+    private void RectangleCase(Dumber semiHeight, Dumber semiWidth) {
       this.RectangleCase(new Vector2(semiHeight, semiWidth));
     }
     private void RectangleDeserializeCase(string json, Vector2 semiSize) {
@@ -116,3 +118,4 @@ namespace FlounderTest
     }
   }
 }
+*/
