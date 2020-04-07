@@ -164,10 +164,9 @@ namespace Flounder
         float minX = Math.Min(minXBefore, minXLater);
         float minY = Math.Min(minYBefore, minYLater);
         float maxX = Math.Max(maxXBefore, maxXLater);
-        float maxY = Math.Max(maxXBefore, maxXLater);
+        float maxY = Math.Max(maxYBefore, maxYLater);
         float sizeX = maxX - minX;
         float sizeY = maxY - minY;
-        // TODO: Insert so it's sorted
         boundingBoxes.Add(new BoundingBox(body, new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
       }
       boundingBoxes.Sort(new BoundingBoxComparer(
