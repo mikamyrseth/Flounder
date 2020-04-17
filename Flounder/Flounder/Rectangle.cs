@@ -6,6 +6,9 @@ namespace Flounder
 {
   public struct Rectangle : IShape
   {
+    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float timeFactor) {
+      throw new NotImplementedException("The collision between Rectangle and any other shape is not implemented!");
+    }
     public static Rectangle ParseCSV(string line) {
       string[] parts = line.Split(',');
       for (int i = 0; i < parts.Length; i++) {

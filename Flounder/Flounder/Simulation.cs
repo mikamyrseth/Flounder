@@ -200,12 +200,16 @@ namespace Flounder
           bool isColliding;
           float collisionTime;
           if (checkForCollision) {
-            isColliding = CheckCollision(boundingBoxes[i].Body, boundingBoxes[j].Body, out collisionTime);
-            if (isColliding){
-              Body body1 = boundingBoxes[i].Body;
-              Body body2 = boundingBoxes[j].Body;
+            Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
 
-              if(collisionTime < lowestCollisionTime){
+            Body body1 = boundingBoxes[i].Body;
+            Body body2 = boundingBoxes[j].Body;
+            Vector2 startDifference = body2.Position - body1.Position;
+            Vector2 endDifference = futureState[body2.ID].Item1 - futureState[body1.ID].Item1;
+            isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor);
+            collisionTime = timeFactor * timeInterval;
+            if (isColliding) {
+              if(collisionTime < lowestCollisionTime) {
                 lowestCollisionTime = collisionTime;
                 collidingBody1 = body1;
                 collidingBody2 = body2;
@@ -217,15 +221,11 @@ namespace Flounder
               */
             }
           }
-          // (
-          //   (-x_{2s} + x_1) (x_{2f} - x_{2s}) + (-y_{2s} + y_1) (y_{2f} - y_{2s})
-          //   - sqrt(r² ( (x_{2f} - x_{2s})² + (y_{2f} - y_{2s})²) -(x_{2f} y_{2s} - x_{2f} y_1 - y_{2s} x_1 + y_1 x_{2s} + x_1 y_{2f} - x_{2s} y_{2f})²)
-          // ) * T / ((x_{2f} - x_{2s})² (y_{2f} - y_{2s})²)
         }
         
       }
 
-      if(lowestCollisionTime != timeInterval){
+      if(lowestCollisionTime != timeInterval) {
         Tick(lowestCollisionTime * 0.90f);
         Body body1 = collidingBody1;
         Body body2 = collidingBody2;
@@ -250,12 +250,7 @@ namespace Flounder
         this._bodies[i] = body;
       }
     }
-    private bool CheckCollision(Body body1, Body body2, out float collisionTime){
-      Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
-      collisionTime = 0;
-      return true;
-    }
-    private void Collision(ref Body body1, ref Body body2){
+    private void Collision(ref Body body1, ref Body body2) {
       //Console.WriteLine("Ohhh boy. Yup it's a collision :((");
       Vector2 v_1s = body1.Velocity; // Start velocity
       Vector2 v_2s = body2.Velocity;

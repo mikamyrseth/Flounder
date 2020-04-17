@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace Flounder
@@ -5,6 +6,7 @@ namespace Flounder
   public interface IShape : ISerializableCSV, ISerializableJSON
   {
     public Vector2 AxisAlignedSize { get; }
+    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float collisionTime);
     public static IShape ParseJSO(dynamic jso) {
       if (jso.circle != null) {
         return Circle.ParseJSO(jso.circle);

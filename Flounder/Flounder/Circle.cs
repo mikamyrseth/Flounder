@@ -6,6 +6,43 @@ namespace Flounder
 {
   public struct Circle : IShape
   {
+    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float timeFactor) {
+      switch(shape) {
+        case Circle circle:
+          float radius = this.Radius + circle.Radius;
+          float stationary = startPosition * (startPosition - endPosition);
+          Vector2 difference = endPosition - startPosition;
+          float squareDifference = difference * difference;
+          float cross = (startPosition.X * endPosition.Y - startPosition.Y * endPosition.X);
+          float squareCross = cross * cross;
+          float inner = radius * radius * squareDifference - squareCross;
+          if (inner < 0) {
+            timeFactor = -1;
+            return false;
+          }
+          float rootInner = MathF.Sqrt(inner);
+          float t0 = (stationary + rootInner) / squareDifference;
+          float t1 = (stationary - rootInner) / squareDifference;
+          if (0 <= t0 && t0 <= 1) {
+            if (0 <= t1 && t1 <= 1) {
+              timeFactor = MathF.Min(t0, t1);
+              return true;
+            } else {
+              timeFactor = t0;
+              return true;
+            }
+          } else {
+            if (0 <= t1 && t1 <= 1) {
+              timeFactor = t1;
+              return true;
+            }
+          }
+          timeFactor = -1;
+          return false;
+        default:
+          throw new NotImplementedException($"The collision between circle and supplied shape {shape} is not defined.");
+      }
+    }
     public static Circle ParseCSV(string line) {
       string[] parts = line.Split(',');
       for (int i = 0; i < parts.Length; i++) {
