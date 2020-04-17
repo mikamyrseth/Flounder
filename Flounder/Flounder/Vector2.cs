@@ -48,5 +48,8 @@ namespace Flounder
       text += indentText + "}";
       return text;
     }
+    public override string ToString() {
+      return this.SerializeCSV(false);
+    }
   }
 }
