@@ -155,12 +155,12 @@ namespace Flounder
         float minYBefore = body.Position.Y - axisAlignedSizeBefore.Y / 2;
         float maxXBefore = body.Position.X + axisAlignedSizeBefore.X / 2;
         float maxYBefore = body.Position.Y + axisAlignedSizeBefore.Y / 2;
-        body = body.SetState(position, velocity, acceleration);
-        Vector2 axisAlignedSizeLater = body.Shape.AxisAlignedSize;
-        float minXLater = body.Position.X - axisAlignedSizeLater.X / 2;
-        float minYLater = body.Position.Y - axisAlignedSizeLater.Y / 2;
-        float maxXLater = body.Position.X + axisAlignedSizeLater.X / 2;
-        float maxYLater = body.Position.Y + axisAlignedSizeLater.Y / 2;
+        Body newBody = body.SetState(position, velocity, acceleration);
+        Vector2 axisAlignedSizeLater = newBody.Shape.AxisAlignedSize;
+        float minXLater = newBody.Position.X - axisAlignedSizeLater.X / 2;
+        float minYLater = newBody.Position.Y - axisAlignedSizeLater.Y / 2;
+        float maxXLater = newBody.Position.X + axisAlignedSizeLater.X / 2;
+        float maxYLater = newBody.Position.Y + axisAlignedSizeLater.Y / 2;
         float minX = Math.Min(minXBefore, minXLater);
         float minY = Math.Min(minYBefore, minYLater);
         float maxX = Math.Max(maxXBefore, maxXLater);
@@ -209,6 +209,7 @@ namespace Flounder
             isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor);
             collisionTime = timeFactor * timeInterval;
             if (isColliding) {
+              Console.WriteLine("YIKES! Yup, that's a collision 😬");
               if(collisionTime < lowestCollisionTime) {
                 lowestCollisionTime = collisionTime;
                 collidingBody1 = body1;
@@ -219,6 +220,8 @@ namespace Flounder
               futureState[body1.ID] = (body1.Position, body1.Velocity, body1.Acceleration);
               futureState[body2.ID] = (body2.Position, body2.Velocity, body2.Acceleration);
               */
+            } else {
+              Console.WriteLine("Phew!! Thankfully, there were no collision :))");
             }
           }
         }
