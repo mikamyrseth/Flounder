@@ -152,27 +152,7 @@ namespace Flounder
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         body.CalculateNextPosition(timeInterval);
-        boundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.));
-        body.BoundingBox();
-
-        Vector2 axisAlignedSizeBefore = body.Shape.AxisAlignedSize;
-        float minXBefore = body.Position.X - axisAlignedSizeBefore.X / 2;
-        float minYBefore = body.Position.Y - axisAlignedSizeBefore.Y / 2;
-        float maxXBefore = body.Position.X + axisAlignedSizeBefore.X / 2;
-        float maxYBefore = body.Position.Y + axisAlignedSizeBefore.Y / 2;
-        Body newBody = body.SetState(position, velocity, acceleration);
-        Vector2 axisAlignedSizeLater = newBody.Shape.AxisAlignedSize;
-        float minXLater = newBody.Position.X - axisAlignedSizeLater.X / 2;
-        float minYLater = newBody.Position.Y - axisAlignedSizeLater.Y / 2;
-        float maxXLater = newBody.Position.X + axisAlignedSizeLater.X / 2;
-        float maxYLater = newBody.Position.Y + axisAlignedSizeLater.Y / 2;
-        float minX = Math.Min(minXBefore, minXLater);
-        float minY = Math.Min(minYBefore, minYLater);
-        float maxX = Math.Max(maxXBefore, maxXLater);
-        float maxY = Math.Max(maxYBefore, maxYLater);
-        float sizeX = maxX - minX;
-        float sizeY = maxY - minY;
-        boundingBoxes.Add(new BoundingBox(new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
+        boundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.BoundingBox));                            // Switch to new body in simulation
       }
       boundingBoxes.Sort(new BodyBoundingBoxComparer(
         BodyBoundingBoxComparer.BodyBoundingBoxAttribute.MinX,
@@ -180,8 +160,8 @@ namespace Flounder
         BodyBoundingBoxComparer.BodyBoundingBoxAttribute.BodyID
       ));
       float lowestCollisionTime = timeInterval;
-      Body collidingBody1 = new Body();
-      Body collidingBody2 = new Body();
+      Body collidingBody1 = null;
+      Body collidingBody2 = null;
       for (int i = 0; i < boundingBoxes.Count; i++) {
         BoundingBox boundingBox1 = boundingBoxes[i];
         for (

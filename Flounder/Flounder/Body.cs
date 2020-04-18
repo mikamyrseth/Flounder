@@ -25,6 +25,12 @@ namespace Flounder
     public Vector2 NextPosition { get; set; }
     public Vector2 Velocity { get; set; }
     public Vector2 Acceleration { get; set; }
+    public BoundingBox BoundingBox {
+      get {
+        BoundingBox shapeBoundingBox = this.Shape.OffsetBoundingBox;
+        return (shapeBoundingBox + this.Position) + (shapeBoundingBox + this.NextPosition);
+      }
+    }
 
     public Body(string id, float mass, IShape shape, List<ConstantAcceleration> accelerations = null, List<ConstantForce> forces = null) {
       this.Accelerations = accelerations ?? new List<ConstantAcceleration>();
