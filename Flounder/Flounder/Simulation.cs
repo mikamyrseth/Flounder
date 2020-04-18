@@ -19,6 +19,7 @@ namespace Flounder
     private const string FLODFileExtension = "flod";
     private const string FLODVersion = "flod v1.0.0";
     private readonly Body[] _bodies;
+    private readonly List<ImmovableObject> _immovableObjects;
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
     private readonly List<ConstantAcceleration> _constantAccelerations = new List<ConstantAcceleration>();
     private readonly FileFormat _fileFormat;
@@ -90,6 +91,13 @@ namespace Flounder
         }
       }
       #endregion
+      //Immovable object
+      dynamic immpovableObjectsJSO = jso.immovableObjcets ?? throw new KeyNotFoundException("Key \"immovableObject\" was expected in input JSON file!");
+      foreach (dynamic immovableObjectJSO in immpovableObjectsJSO) {
+        ImmovableObject immovableObject = ImmovableObject.ParseJSO(immovableObjectJSO);
+        this._immovableObjects.Add(immovableObject);
+      }
+
       this._bodies = new Body[bodies.Count];
       int i = 0;
       foreach (Body body in bodies.Values) {
@@ -140,16 +148,13 @@ namespace Flounder
       }
     }
     private void Tick(float timeInterval) {
-      List<BoundingBox> boundingBoxes = new List<BoundingBox>();
-      Dictionary<string, (Vector2, Vector2, Vector2)> futureState = new Dictionary<string, (Vector2, Vector2, Vector2)>();
+      List<Tuple<Body, BoundingBox>> boundingBoxes = new List<Tuple<Body, BoundingBox>>();
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
-        Vector2 forceSum = body.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force);
-        Vector2 acceleration = forceSum / body.Mass;
-        acceleration += body.Accelerations.Aggregate(new Vector2(), (current, acceleration) => current + acceleration.Acceleration);
-        Vector2 velocity = body.Velocity + timeInterval * acceleration;
-        Vector2 position = body.Position + timeInterval * velocity;
-        futureState.Add(body.ID, (position, velocity, acceleration)); // Get a new body with new position 
+        body.CalculateNextPosition(timeInterval);
+        boundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.));
+        body.BoundingBox();
+
         Vector2 axisAlignedSizeBefore = body.Shape.AxisAlignedSize;
         float minXBefore = body.Position.X - axisAlignedSizeBefore.X / 2;
         float minYBefore = body.Position.Y - axisAlignedSizeBefore.Y / 2;
@@ -167,12 +172,12 @@ namespace Flounder
         float maxY = Math.Max(maxYBefore, maxYLater);
         float sizeX = maxX - minX;
         float sizeY = maxY - minY;
-        boundingBoxes.Add(new BoundingBox(body, new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
+        boundingBoxes.Add(new BoundingBox(new Vector2(minX, minY), new Vector2(sizeX, sizeY)));                              // Switch to new body in simulation
       }
-      boundingBoxes.Sort(new BoundingBoxComparer(
-        BoundingBoxComparer.BoundingBoxAttribute.MinX,
-        BoundingBoxComparer.BoundingBoxAttribute.MaxX,
-        BoundingBoxComparer.BoundingBoxAttribute.BodyID
+      boundingBoxes.Sort(new BodyBoundingBoxComparer(
+        BodyBoundingBoxComparer.BodyBoundingBoxAttribute.MinX,
+        BodyBoundingBoxComparer.BodyBoundingBoxAttribute.MaxX,
+        BodyBoundingBoxComparer.BodyBoundingBoxAttribute.BodyID
       ));
       float lowestCollisionTime = timeInterval;
       Body collidingBody1 = new Body();
@@ -229,7 +234,7 @@ namespace Flounder
       }
 
       if(lowestCollisionTime != timeInterval) {
-        Tick(lowestCollisionTime * 0.90f);
+        Tick(lowestCollisionTime * 0.99f);
         Body body1 = collidingBody1;
         Body body2 = collidingBody2;
         Collision(ref body1, ref body2);
@@ -265,6 +270,17 @@ namespace Flounder
       
       body1 = body1.SetState(body1.Position, v_1f, body1.Acceleration);
       body2 = body2.SetState(body2.Position, v_2f, body2.Acceleration);
+    }
+    private void Collision(ref Body body1, ImmovableObject immovableObject, Vector2 normalVector){
+      //Console.WriteLine("Ohhh boy. Yup it's a collision :((");
+      Vector2 v_1s = body1.Velocity; // Start velocity
+      Vector2 v_2s = 0
+      float m_1 = body1.Mass;
+      float m_2 = inf;
+
+      Vector2 v_1f = (m_1*v_1s - m_2*v_1s + 2*m_2*v_2s)/(m_1+m_2);
+      
+      body1 = body1.SetState(body1.Position, v_1f, body1.Acceleration);
     }
   }
 }

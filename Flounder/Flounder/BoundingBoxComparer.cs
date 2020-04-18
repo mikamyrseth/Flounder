@@ -3,46 +3,46 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 namespace Flounder
 {
-  public class BoundingBoxComparer : IComparer<BoundingBox> {
-    public enum BoundingBoxAttribute {
+  public class BodyBoundingBoxComparer : IComparer<Tuple<Body, BoundingBox>> {
+    public enum BodyBoundingBoxAttribute {
       BodyID,
       MaxX,
       MaxY,
       MinX,
       MinY,
     }
-    private List<BoundingBoxAttribute> _sortOrder;
+    private List<BodyBoundingBoxAttribute> _sortOrder;
 
-    public BoundingBoxComparer(params BoundingBoxAttribute[] attributes) {
-      this._sortOrder = new List<BoundingBoxAttribute>(attributes);
+    public BodyBoundingBoxComparer(params BodyBoundingBoxAttribute[] attributes) {
+      this._sortOrder = new List<BodyBoundingBoxAttribute>(attributes);
     }
 
-    public int Compare(BoundingBox a, BoundingBox b) {
-      foreach (BoundingBoxAttribute attribute in this._sortOrder) {
+    public int Compare(Tuple<Body, BoundingBox> a, Tuple<Body, BoundingBox> b) {
+      foreach (BodyBoundingBoxAttribute attribute in this._sortOrder) {
         switch (attribute) {
-          case BoundingBoxAttribute.BodyID:
-            if(a.Body.ID != b.Body.ID){
-              return string.Compare(a.Body.ID, b.Body.ID, StringComparison.InvariantCulture);
+          case BodyBoundingBoxAttribute.BodyID:
+            if(a.Item1.ID != b.Item1.ID){
+              return string.Compare(a.Item1.ID, b.Item1.ID, StringComparison.InvariantCulture);
             }
             break;
-          case BoundingBoxAttribute.MaxX:
-            if(a.MaxX != b.MaxX){
-              return a.MaxX.CompareTo(b.MaxX);
+          case BodyBoundingBoxAttribute.MaxX:
+            if(a.Item2.MaxX != b.Item2.MaxX){
+              return a.Item2.MaxX.CompareTo(b.Item2.MaxX);
             }
             break;
-          case BoundingBoxAttribute.MaxY:
-            if(a.MaxY != b.MaxY){
-              return a.MaxY.CompareTo(b.MaxY);
+          case BodyBoundingBoxAttribute.MaxY:
+            if(a.Item2.MaxY != b.Item2.MaxY){
+              return a.Item2.MaxY.CompareTo(b.Item2.MaxY);
             }
             break;
-          case BoundingBoxAttribute.MinX:
-            if(a.MinX != b.MinX){
-              return a.MinX.CompareTo(b.MinX);
+          case BodyBoundingBoxAttribute.MinX:
+            if(a.Item2.MinX != b.Item2.MinX){
+              return a.Item2.MinX.CompareTo(b.Item2.MinX);
             }
             break;
-          case BoundingBoxAttribute.MinY:
-            if (a.MinY != b.MinY){
-              return a.MinY.CompareTo(b.MinY);
+          case BodyBoundingBoxAttribute.MinY:
+            if (a.Item2.MinY != b.Item2.MinY){
+              return a.Item2.MinY.CompareTo(b.Item2.MinY);
             }
             break;
           default:

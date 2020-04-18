@@ -31,8 +31,8 @@ namespace Flounder
     public float Height {
       get { return 2 * this.SemiHeight; }
     }
-    public Vector2 AxisAlignedSize {
-      get { return this.Size; }
+    public BoundingBox OffsetBoundingBox {
+      get { return new BoundingBox(-this.SemiSize, this.Size); }
     }
     public float SemiHeight {
       get { return this._semiSize.Y; }
