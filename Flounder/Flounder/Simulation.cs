@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Security.Cryptography;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -152,7 +153,7 @@ namespace Flounder
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         body.CalculateNextPosition(timeInterval);
-        boundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.BoundingBox));                            // Switch to new body in simulation
+        boundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.BoundingBox));
       }
       boundingBoxes.Sort(new BodyBoundingBoxComparer(
         BodyBoundingBoxComparer.BodyBoundingBoxAttribute.MinX,
@@ -163,19 +164,19 @@ namespace Flounder
       Body collidingBody1 = null;
       Body collidingBody2 = null;
       for (int i = 0; i < boundingBoxes.Count; i++) {
-        BoundingBox boundingBox1 = boundingBoxes[i];
+        Tuple<Body, BoundingBox> boundingBox1 = boundingBoxes[i];
         for (
           int j = i + 1;
-          j < boundingBoxes.Count && boundingBoxes[j].MinX <= boundingBoxes[i].MaxX; 
+          j < boundingBoxes.Count && boundingBoxes[j].Item2.MinX <= boundingBoxes[i].Item2.MaxX;
           j++
         ) {
           bool checkForCollision = false;
-          if (boundingBoxes[i].MinY < boundingBoxes[j].MinY) {
-            if (boundingBoxes[j].MinY <= boundingBoxes[i].MaxY) {
+          if (boundingBoxes[i].Item2.MinY < boundingBoxes[j].Item2.MinY) {
+            if (boundingBoxes[j].Item2.MinY <= boundingBoxes[i].Item2.MaxY) {
               checkForCollision = true;
             }
-          } else if (boundingBoxes[j].MinY < boundingBoxes[i].MinY) {
-            if (boundingBoxes[i].MinY <= boundingBoxes[j].MaxY) {
+          } else if (boundingBoxes[j].Item2.MinY < boundingBoxes[i].Item2.MinY) {
+            if (boundingBoxes[i].Item2.MinY <= boundingBoxes[j].Item2.MaxY) {
               checkForCollision = true; 
             }
           } else {
@@ -187,10 +188,10 @@ namespace Flounder
           if (checkForCollision) {
             Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
 
-            Body body1 = boundingBoxes[i].Body;
-            Body body2 = boundingBoxes[j].Body;
+            Body body1 = boundingBoxes[i].Item1;
+            Body body2 = boundingBoxes[j].Item1;
             Vector2 startDifference = body2.Position - body1.Position;
-            Vector2 endDifference = futureState[body2.ID].Item1 - futureState[body1.ID].Item1;
+            Vector2 endDifference = body2.NextPosition - body1.NextPosition;
             isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor);
             collisionTime = timeFactor * timeInterval;
             if (isColliding) {
@@ -217,50 +218,46 @@ namespace Flounder
         Tick(lowestCollisionTime * 0.99f);
         Body body1 = collidingBody1;
         Body body2 = collidingBody2;
-        Collision(ref body1, ref body2);
-        futureState[body1.ID] = (body1.Position, body1.Velocity, body1.Acceleration);
-        futureState[body2.ID] = (body2.Position, body2.Velocity, body2.Acceleration);
-        for (int i = 0; i < this._bodies.Length; i++) {
-          if (_bodies[i].ID == body1.ID) {
-            _bodies[i] = _bodies[i].SetVelocity(body1.Velocity);
-          }
-          if (_bodies[i].ID == body2.ID) {
-            _bodies[i] = _bodies[i].SetVelocity(body2.Velocity);
-          }
-        }
-        return;
-      }
-
-      for (int i = 0; i < this._bodies.Length; i++) {
-        Body body = this._bodies[i];
-        (Vector2, Vector2, Vector2) newState = futureState[body.ID];
-        body = body.SetState(newState.Item1, newState.Item2, newState.Item3);
-        this._bodies[i] = body;
+        Collision(body1, body2);
       }
     }
-    private void Collision(ref Body body1, ref Body body2) {
+    private void Collision(Body body1, Body body2, Vector2 normal) {
       //Console.WriteLine("Ohhh boy. Yup it's a collision :((");
-      Vector2 v_1s = body1.Velocity; // Start velocity
-      Vector2 v_2s = body2.Velocity;
       float m_1 = body1.Mass;
       float m_2 = body2.Mass;
-
-      Vector2 v_1f = (m_1*v_1s - m_2*v_1s + 2*m_2*v_2s)/(m_1+m_2);
-      Vector2 v_2f = (2*m_1*v_1s - m_1*v_2s + m_2*v_2s)/(m_1+m_2);
       
-      body1 = body1.SetState(body1.Position, v_1f, body1.Acceleration);
-      body2 = body2.SetState(body2.Position, v_2f, body2.Acceleration);
+      Vector2 nv_1s = this.ToNormal(body1.Velocity, normal);
+      Vector2 nv_2s = this.ToNormal(body2.Velocity, normal);
+
+      float nv_1fx = (m_1*nv_1s.X - m_2*nv_1s.X + 2*m_2*nv_2s.X)/(m_1+m_2);
+      float nv_2fx = (2*m_1*nv_1s.X - m_1*nv_2s.X + m_2*nv_2s.X)/(m_1+m_2);
+
+      Vector2 nv_1f = new Vector2(nv_1fx, nv_1s.Y);
+      Vector2 nv_2f = new Vector2(nv_2fx, nv_2s.Y);
+      
+      body1.Velocity = this.FromNormal(nv_1f, normal);
+      body2.Velocity = this.FromNormal(nv_2f, normal);
     }
-    private void Collision(ref Body body1, ImmovableObject immovableObject, Vector2 normalVector){
+    private void CollisionWithImmovableObject(Body body, Vector2 normal) {
       //Console.WriteLine("Ohhh boy. Yup it's a collision :((");
-      Vector2 v_1s = body1.Velocity; // Start velocity
-      Vector2 v_2s = 0
-      float m_1 = body1.Mass;
-      float m_2 = inf;
-
-      Vector2 v_1f = (m_1*v_1s - m_2*v_1s + 2*m_2*v_2s)/(m_1+m_2);
-      
-      body1 = body1.SetState(body1.Position, v_1f, body1.Acceleration);
+      body.Velocity = this.Bounce(body.Velocity, normal);
+    }
+    private Vector2 Bounce(Vector2 original, Vector2 normal) {
+      Vector2 normalSpaceOriginal = this.ToNormal(original, normal);
+      Vector2 normalSpaceReflection = new Vector2(-normalSpaceOriginal.X, normalSpaceOriginal.Y);
+      return this.FromNormal(normalSpaceOriginal, normal);
+    }
+    private Vector2 FromNormal(Vector2 original, Vector2 normal) {
+      return new Vector2(
+        normal.X * original.X - normal.Y * original.Y,
+        normal.Y * original.X + normal.X * original.Y
+      );
+    }
+    private Vector2 ToNormal(Vector2 original, Vector2 normal) {
+      return new Vector2(
+        normal.X * original.X + normal.Y * original.Y,
+        -normal.Y * original.X + normal.X * original.Y
+      ) / (normal.X * normal.X + normal.Y * normal.Y);
     }
   }
 }
