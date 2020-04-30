@@ -21,11 +21,8 @@
             "id": "Car",
             "mass": 100,
             "shape": {
-                "rectangle": {
-                    "semiSize": {
-                        "x": 2,
-                        "y": 1.5
-                    }
+                "circle": {
+                    "radius": 1.5
                 }
             },
             "position": {
@@ -64,13 +61,16 @@
         {
             "id": "Car going fast!",
             "vector": {
-                "x": 10,
+                "x": 9.5,
                 "y": 0
             },
             "bodies": [
                 "Car"
             ]
         }
+    ],
+    "immovableObjects": [
+
     ],
     "duration": 5,
     "precision": "Nano",

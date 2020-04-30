@@ -217,7 +217,7 @@ namespace Flounder
       }
 
       if(lowestCollisionTime != timeInterval) {
-        Tick(lowestCollisionTime * 0.99f);
+        Tick(lowestCollisionTime * 0.98f);
         Body body1 = collidingBody1;
         Body body2 = collidingBody2;
         Collision(body1, body2, lowerCollisionNormal);
@@ -232,8 +232,8 @@ namespace Flounder
       float m_1 = body1.Mass;
       float m_2 = body2.Mass;
       
-      Vector2 nv_1s = this.ToNormal(body1.Velocity, normal);
-      Vector2 nv_2s = this.ToNormal(body2.Velocity, normal);
+      Vector2 nv_1s = body1.Velocity.ToBaseSpace(normal);
+      Vector2 nv_2s = body2.Velocity.ToBaseSpace(normal);
 
       float nv_1fx = (m_1*nv_1s.X - m_2*nv_1s.X + 2*m_2*nv_2s.X)/(m_1+m_2);
       float nv_2fx = (2*m_1*nv_1s.X - m_1*nv_2s.X + m_2*nv_2s.X)/(m_1+m_2);
@@ -241,29 +241,17 @@ namespace Flounder
       Vector2 nv_1f = new Vector2(nv_1fx, nv_1s.Y);
       Vector2 nv_2f = new Vector2(nv_2fx, nv_2s.Y);
       
-      body1.Velocity = this.FromNormal(nv_1f, normal);
-      body2.Velocity = this.FromNormal(nv_2f, normal);
+      body1.Velocity = nv_1f.FromBaseSpace(normal);
+      body2.Velocity = nv_2f.FromBaseSpace(normal);
     }
     private void CollisionWithImmovableObject(Body body, Vector2 normal) {
       //Console.WriteLine("Ohhh boy. Yup it's a collision :((");
       body.Velocity = this.Bounce(body.Velocity, normal);
     }
     private Vector2 Bounce(Vector2 original, Vector2 normal) {
-      Vector2 normalSpaceOriginal = this.ToNormal(original, normal);
+      Vector2 normalSpaceOriginal = original.ToBaseSpace(normal);
       Vector2 normalSpaceReflection = new Vector2(-normalSpaceOriginal.X, normalSpaceOriginal.Y);
-      return this.FromNormal(normalSpaceOriginal, normal);
-    }
-    private Vector2 FromNormal(Vector2 original, Vector2 normal) {
-      return new Vector2(
-        normal.X * original.X - normal.Y * original.Y,
-        normal.Y * original.X + normal.X * original.Y
-      );
-    }
-    private Vector2 ToNormal(Vector2 original, Vector2 normal) {
-      return new Vector2(
-        normal.X * original.X + normal.Y * original.Y,
-        -normal.Y * original.X + normal.X * original.Y
-      ) / (normal.X * normal.X + normal.Y * normal.Y);
+      return normalSpaceReflection.FromBaseSpace(normal);
     }
   }
 }

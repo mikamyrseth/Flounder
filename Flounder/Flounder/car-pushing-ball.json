@@ -59,6 +59,9 @@
             ]
         }
     ],
+    "immovableObjects": [
+
+    ],
     "duration": 4,
     "precision": "Nano",
     "timeInterval": 0.0011

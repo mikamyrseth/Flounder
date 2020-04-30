@@ -51,6 +51,18 @@ namespace Flounder
       text += indentText + "}";
       return text;
     }
+    public Vector2 FromBaseSpace(Vector2 baseVector) {
+      return new Vector2(
+        baseVector.X * this.X - baseVector.Y * this.Y,
+        baseVector.Y * this.X + baseVector.X * this.Y
+      );
+    }
+    public Vector2 ToBaseSpace(Vector2 baseVector) {
+      return new Vector2(
+        baseVector.X * this.X + baseVector.Y * this.Y,
+        -baseVector.Y * this.X + baseVector.X * this.Y
+      ) / (baseVector.X * baseVector.X + baseVector.Y * baseVector.Y);
+    }
     public override string ToString() {
       return this.SerializeCSV(false);
     }
