@@ -6,7 +6,7 @@ namespace Flounder
   public interface IShape : ISerializableCSV, ISerializableJSON
   {
     public BoundingBox OffsetBoundingBox { get; }
-    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float collisionTime);
+    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float collisionTime, out Vector2 normal);
     public static IShape ParseJSO(dynamic jso) {
       if (jso.circle != null) {
         return Circle.ParseJSO(jso.circle);

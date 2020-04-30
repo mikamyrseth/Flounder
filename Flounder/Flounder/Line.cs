@@ -1,7 +1,8 @@
 using System.Globalization;
 using System;
 using System.Collections.Generic;
-namespace Flounder{
+/*
+namespace Flounder {
 
   public struct Line : IShape {
 
@@ -45,3 +46,4 @@ namespace Flounder{
   }
 
 }
+*/

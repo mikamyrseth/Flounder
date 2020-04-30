@@ -4,10 +4,10 @@ namespace Flounder
   public readonly struct BoundingBox 
   {
     public static BoundingBox operator +(Vector2 a, BoundingBox b) {
-      return new BoundingBox(this.Position + a, this.Size));
+      return new BoundingBox(b.Position + a, b.Size);
     }
     public static BoundingBox operator +(BoundingBox b, Vector2 a) {
-      return new BoundingBox(this.Position + a, this.Size));
+      return new BoundingBox(b.Position + a, b.Size);
     }
     public static BoundingBox operator +(BoundingBox a, BoundingBox b) {
       Vector2 position = new Vector2(MathF.Min(a.MinX, b.MinX), MathF.Min(a.MinY, b.MinY));

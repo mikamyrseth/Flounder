@@ -93,7 +93,7 @@ namespace Flounder
       }
       #endregion
       //Immovable object
-      dynamic immpovableObjectsJSO = jso.immovableObjcets ?? throw new KeyNotFoundException("Key \"immovableObject\" was expected in input JSON file!");
+      dynamic immpovableObjectsJSO = jso.immovableObjects ?? throw new KeyNotFoundException("Key \"immovableObjects\" was expected in input JSON file!");
       foreach (dynamic immovableObjectJSO in immpovableObjectsJSO) {
         ImmovableObject immovableObject = ImmovableObject.ParseJSO(immovableObjectJSO);
         this._immovableObjects.Add(immovableObject);
@@ -161,6 +161,7 @@ namespace Flounder
         BodyBoundingBoxComparer.BodyBoundingBoxAttribute.BodyID
       ));
       float lowestCollisionTime = timeInterval;
+      Vector2 lowerCollisionNormal = new Vector2();
       Body collidingBody1 = null;
       Body collidingBody2 = null;
       for (int i = 0; i < boundingBoxes.Count; i++) {
@@ -192,12 +193,13 @@ namespace Flounder
             Body body2 = boundingBoxes[j].Item1;
             Vector2 startDifference = body2.Position - body1.Position;
             Vector2 endDifference = body2.NextPosition - body1.NextPosition;
-            isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor);
+            isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor, out Vector2 collisionNormal);
             collisionTime = timeFactor * timeInterval;
             if (isColliding) {
               Console.WriteLine("YIKES! Yup, that's a collision 😬");
               if(collisionTime < lowestCollisionTime) {
                 lowestCollisionTime = collisionTime;
+                lowerCollisionNormal = collisionNormal;
                 collidingBody1 = body1;
                 collidingBody2 = body2;
               }
@@ -218,7 +220,11 @@ namespace Flounder
         Tick(lowestCollisionTime * 0.99f);
         Body body1 = collidingBody1;
         Body body2 = collidingBody2;
-        Collision(body1, body2);
+        Collision(body1, body2, lowerCollisionNormal);
+      } else {
+        foreach (Body body in this._bodies) {
+          body.Commit();
+        }
       }
     }
     private void Collision(Body body1, Body body2, Vector2 normal) {

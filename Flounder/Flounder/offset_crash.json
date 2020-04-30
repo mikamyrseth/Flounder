@@ -1,0 +1,82 @@
+{
+    "bodies": [
+        {
+            "id": "small",
+            "mass": 10,
+            "shape": {
+                "circle": {
+                    "radius": 1
+                }
+            },
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "velocity": {
+                "x": 0,
+                "y": 5
+            }
+        },
+        {
+            "id": "HUGE",
+            "mass": 30,
+            "shape": {
+                "circle": {
+                    "radius": 3
+                }
+            },
+            "position": {
+                "x": 4,
+                "y": -4
+            },
+            "velocity": {
+                "x": -6,
+                "y": 6
+            }
+        },
+        {
+            "id": "BIG",
+            "mass": 20,
+            "shape": {
+                "circle": {
+                    "radius": 2
+                }
+            },
+            "position": {
+                "x": 1,
+                "y": 10
+            },
+            "velocity": {
+                "x": 0,
+                "y": -10
+            }
+        },
+        {
+            "id": "medium",
+            "mass": 20,
+            "shape": {
+                "circle": {
+                    "radius": 1.5
+                }
+            },
+            "position": {
+                "x": -10,
+                "y": 5
+            },
+            "velocity": {
+                "x": 10,
+                "y": 0
+            }
+        }
+    ],
+    "constantForces": [
+    ],
+    "constantAccelerations": [
+    ],
+    "duration": 5,
+    "precision": "Nano",
+    "timeInterval": 0.0011,
+    "immovableObjects": [
+
+    ] 
+}

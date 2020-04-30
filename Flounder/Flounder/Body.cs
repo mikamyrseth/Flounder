@@ -12,8 +12,8 @@ namespace Flounder
         (int)(jso.mass ?? throw new KeyNotFoundException("Key \"mass\" was expected in input JSON file!")),
         IShape.ParseJSO(jso.shape ?? throw new KeyNotFoundException("Key \"shape\" was expected in input JSON file!"))
       );
-      body.Position = Vector2.ParseJSO(jso.position ?? throw new KeyNotFoundException("Key \"position\" was expected in input JSON file!")), 
-      body.Velocity = Vector2.ParseJSO(jso.velocity ?? throw new KeyNotFoundException("Key \"velocity\" was expected in input JSON file!")), 
+      body.Position = Vector2.ParseJSO(jso.position ?? throw new KeyNotFoundException("Key \"position\" was expected in input JSON file!")); 
+      body.Velocity = Vector2.ParseJSO(jso.velocity ?? throw new KeyNotFoundException("Key \"velocity\" was expected in input JSON file!")); 
       return body;
     }
     public List<ConstantAcceleration> Accelerations { get; }
@@ -44,10 +44,13 @@ namespace Flounder
     }
 
     public void CalculateNextPosition(float timeInterval) {
-      this.Acceleration = this.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force) / body.Mass;
+      this.Acceleration = this.Forces.Aggregate(new Vector2(), (current, force) => current + force.Force) / this.Mass;
       this.Acceleration += this.Accelerations.Aggregate(new Vector2(), (current, acceleration) => current + acceleration.Acceleration);
       this.Velocity += timeInterval * this.Acceleration;
-      this.NextPosition = this.Position + timeInterval * this.Position;
+      this.NextPosition = this.Position + timeInterval * this.Velocity;
+    }
+    public void Commit() {
+      this.Position = this.NextPosition;
     }
     public string SerializeJSON(int indent = 0, bool singleLine = false) {
       if (singleLine) {

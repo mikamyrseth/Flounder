@@ -6,7 +6,7 @@ namespace Flounder
 {
   public struct Circle : IShape
   {
-    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float timeFactor) {
+    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float timeFactor, out Vector2 normal) {
       switch(shape) {
         case Circle circle:
           float radius = this.Radius + circle.Radius;
@@ -18,6 +18,7 @@ namespace Flounder
           float inner = radius * radius * squareDifference - squareCross;
           if (inner < 0) {
             timeFactor = -1;
+            normal = new Vector2(1, 0);
             return false;
           }
           float rootInner = MathF.Sqrt(inner);
@@ -26,18 +27,22 @@ namespace Flounder
           if (0 <= t0 && t0 <= 1) {
             if (0 <= t1 && t1 <= 1) {
               timeFactor = MathF.Min(t0, t1);
+              normal = (1 - timeFactor) * startPosition + timeFactor * endPosition;
               return true;
             } else {
               timeFactor = t0;
+              normal = (1 - timeFactor) * startPosition + timeFactor * endPosition;
               return true;
             }
           } else {
             if (0 <= t1 && t1 <= 1) {
               timeFactor = t1;
+              normal = (1 - timeFactor) * startPosition + timeFactor * endPosition;
               return true;
             }
           }
           timeFactor = -1;
+            normal = new Vector2(1, 0);
           return false;
         default:
           throw new NotImplementedException($"The collision between circle and supplied shape {shape} is not defined.");
