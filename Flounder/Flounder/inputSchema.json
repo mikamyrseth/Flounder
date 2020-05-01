@@ -73,8 +73,6 @@
         }
     ],
     "duration": 4,
-    "precision": "Nano",
-    "timeInterval": 0.01,
     "immovableObjects": [
         {
             "id": "Thø Ground",
@@ -91,5 +89,7 @@
                 "y": 0
             }
         }
-    ] 
+    ],
+    "precision": "Nano",
+    "timeInterval": 0.01
 }

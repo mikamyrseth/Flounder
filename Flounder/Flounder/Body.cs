@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 namespace Flounder
 {
-  public class Body : ISerializableJSON
+  public class Body : FlounderObject, ISerializableJSON
   {
     public static Body ParseJSO(dynamic jso) {
       Body body = new Body(
@@ -18,7 +18,6 @@ namespace Flounder
     }
     public List<ConstantAcceleration> Accelerations { get; }
     public List<ConstantForce> Forces { get; }
-    public string ID { get; }
     public float Mass { get; }
     public IShape Shape { get; set; }
     public Vector2 Position { get; set; }
@@ -32,10 +31,11 @@ namespace Flounder
       }
     }
 
-    public Body(string id, float mass, IShape shape, List<ConstantAcceleration> accelerations = null, List<ConstantForce> forces = null) {
+    public Body(string id, float mass, IShape shape, List<ConstantAcceleration> accelerations = null, List<ConstantForce> forces = null)
+      : base(id)
+    {
       this.Accelerations = accelerations ?? new List<ConstantAcceleration>();
       this.Forces = forces ?? new List<ConstantForce>();
-      this.ID = id;
       this.Mass = mass;
       this.Shape = shape ?? throw new ArgumentException("Shape cannot be null");
       this.Position = new Vector2();

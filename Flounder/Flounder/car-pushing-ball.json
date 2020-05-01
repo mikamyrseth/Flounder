@@ -55,12 +55,26 @@
                 "y": -9.80665
             },
             "bodies": [
-                ""
+                "Car", "Ball"
             ]
         }
     ],
     "immovableObjects": [
-
+        {
+            "id": "Thø Ground",
+            "shape": {
+                "line": {
+                    "semiLength": {
+                        "x": 20,
+                        "y": 0
+                    }
+                }
+            },
+            "position": {
+                "x": 18,
+                "y": -10
+            }
+        }
     ],
     "duration": 4,
     "precision": "Nano",

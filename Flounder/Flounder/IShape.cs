@@ -103,6 +103,9 @@ namespace Flounder
       if (jso.rectangle != null) {
         return Rectangle.ParseJSO(jso.rectangle);
       }
+      if (jso.line != null) {
+        return Line.ParseJSO(jso.line);
+      }
       throw new KeyNotFoundException("No valid shape key found in input JSON file!");
     }
     public static string SerializeJSON(string shapeName, string shapeJSON, int indent = 0, bool singleLine = false) {

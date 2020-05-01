@@ -20,7 +20,8 @@ namespace Flounder
     private const string FLODFileExtension = "flod";
     private const string FLODVersion = "flod v1.0.0";
     private readonly Body[] _bodies;
-    private readonly List<ImmovableObject> _immovableObjects;
+    private readonly List<ImmovableObject> _immovableObjects = new List<ImmovableObject>();
+    private readonly List<Tuple<ImmovableObject, BoundingBox>> _immovableObjectBoundingBoxes = new List<Tuple<ImmovableObject, BoundingBox>>();
     private readonly List<ConstantForce> _constantForces = new List<ConstantForce>();
     private readonly List<ConstantAcceleration> _constantAccelerations = new List<ConstantAcceleration>();
     private readonly FileFormat _fileFormat;
@@ -97,7 +98,17 @@ namespace Flounder
       foreach (dynamic immovableObjectJSO in immpovableObjectsJSO) {
         ImmovableObject immovableObject = ImmovableObject.ParseJSO(immovableObjectJSO);
         this._immovableObjects.Add(immovableObject);
+        this._immovableObjectBoundingBoxes.Add(
+          new Tuple<ImmovableObject, BoundingBox>(immovableObject, immovableObject.Shape.OffsetBoundingBox)
+        );
       }
+      this._immovableObjectBoundingBoxes.Sort(
+        new ObjectBoundingBoxComparer<ImmovableObject>(
+          ObjectBoundingBoxComparer<ImmovableObject>.ObjectBoundingBoxAttribute.MinX,
+          ObjectBoundingBoxComparer<ImmovableObject>.ObjectBoundingBoxAttribute.MaxX,
+          ObjectBoundingBoxComparer<ImmovableObject>.ObjectBoundingBoxAttribute.ObjectID
+        )
+      );
 
       this._bodies = new Body[bodies.Count];
       int i = 0;
@@ -149,52 +160,50 @@ namespace Flounder
       }
     }
     private void Tick(float timeInterval) {
-      List<Tuple<Body, BoundingBox>> boundingBoxes = new List<Tuple<Body, BoundingBox>>();
+      List<Tuple<Body, BoundingBox>> bodyBoundingBoxes = new List<Tuple<Body, BoundingBox>>();
       for (int i = 0; i < this._bodies.Length; i++) { // For every body
         Body body = this._bodies[i];
         body.CalculateNextPosition(timeInterval);
-        boundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.BoundingBox));
+        bodyBoundingBoxes.Add(new Tuple<Body, BoundingBox>(body, body.BoundingBox));
       }
-      boundingBoxes.Sort(new BodyBoundingBoxComparer(
-        BodyBoundingBoxComparer.BodyBoundingBoxAttribute.MinX,
-        BodyBoundingBoxComparer.BodyBoundingBoxAttribute.MaxX,
-        BodyBoundingBoxComparer.BodyBoundingBoxAttribute.BodyID
+      bodyBoundingBoxes.Sort(new ObjectBoundingBoxComparer<Body>(
+        ObjectBoundingBoxComparer<Body>.ObjectBoundingBoxAttribute.MinX,
+        ObjectBoundingBoxComparer<Body>.ObjectBoundingBoxAttribute.MaxX,
+        ObjectBoundingBoxComparer<Body>.ObjectBoundingBoxAttribute.ObjectID
       ));
       float lowestCollisionTime = timeInterval;
       Vector2 lowerCollisionNormal = new Vector2();
       Body collidingBody1 = null;
       Body collidingBody2 = null;
-      for (int i = 0; i < boundingBoxes.Count; i++) {
-        Tuple<Body, BoundingBox> boundingBox1 = boundingBoxes[i];
+      for (int i = 0; i < bodyBoundingBoxes.Count; i++) {
+        Tuple<Body, BoundingBox> boundingBox1 = bodyBoundingBoxes[i];
         for (
           int j = i + 1;
-          j < boundingBoxes.Count && boundingBoxes[j].Item2.MinX <= boundingBoxes[i].Item2.MaxX;
+          j < bodyBoundingBoxes.Count && bodyBoundingBoxes[j].Item2.MinX <= bodyBoundingBoxes[i].Item2.MaxX;
           j++
         ) {
           bool checkForCollision = false;
-          if (boundingBoxes[i].Item2.MinY < boundingBoxes[j].Item2.MinY) {
-            if (boundingBoxes[j].Item2.MinY <= boundingBoxes[i].Item2.MaxY) {
+          if (bodyBoundingBoxes[i].Item2.MinY < bodyBoundingBoxes[j].Item2.MinY) {
+            if (bodyBoundingBoxes[j].Item2.MinY <= bodyBoundingBoxes[i].Item2.MaxY) {
               checkForCollision = true;
             }
-          } else if (boundingBoxes[j].Item2.MinY < boundingBoxes[i].Item2.MinY) {
-            if (boundingBoxes[i].Item2.MinY <= boundingBoxes[j].Item2.MaxY) {
+          } else if (bodyBoundingBoxes[j].Item2.MinY < bodyBoundingBoxes[i].Item2.MinY) {
+            if (bodyBoundingBoxes[i].Item2.MinY <= bodyBoundingBoxes[j].Item2.MaxY) {
               checkForCollision = true; 
             }
           } else {
             checkForCollision = true; 
           }
 
-          bool isColliding;
-          float collisionTime;
           if (checkForCollision) {
             Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
 
-            Body body1 = boundingBoxes[i].Item1;
-            Body body2 = boundingBoxes[j].Item1;
+            Body body1 = bodyBoundingBoxes[i].Item1;
+            Body body2 = bodyBoundingBoxes[j].Item1;
             Vector2 startDifference = body2.Position - body1.Position;
             Vector2 endDifference = body2.NextPosition - body1.NextPosition;
-            isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor, out Vector2 collisionNormal);
-            collisionTime = timeFactor * timeInterval;
+            bool isColliding = body1.Shape.DoesCollide(body2.Shape, startDifference, endDifference, out float timeFactor, out Vector2 collisionNormal);
+            float collisionTime = timeFactor * timeInterval;
             if (isColliding) {
               Console.WriteLine("YIKES! Yup, that's a collision 😬");
               if(collisionTime < lowestCollisionTime) {
@@ -213,14 +222,66 @@ namespace Flounder
             }
           }
         }
+        for (
+          int k = 0;
+          k < this._immovableObjectBoundingBoxes.Count
+              && this._immovableObjectBoundingBoxes[k].Item2.MinX <= bodyBoundingBoxes[i].Item2.MaxX;
+          k++
+        ) {
+          if (this._immovableObjectBoundingBoxes[k].Item2.MaxX < bodyBoundingBoxes[i].Item2.MinX) {
+            continue;
+          }
+
+          bool checkForCollision = false;
+          if (bodyBoundingBoxes[i].Item2.MinY < this._immovableObjectBoundingBoxes[k].Item2.MinY) {
+            if (this._immovableObjectBoundingBoxes[k].Item2.MinY <= bodyBoundingBoxes[i].Item2.MaxY) {
+              checkForCollision = true;
+            }
+          } else if (this._immovableObjectBoundingBoxes[k].Item2.MinY < bodyBoundingBoxes[i].Item2.MinY) {
+            if (bodyBoundingBoxes[i].Item2.MinY <= this._immovableObjectBoundingBoxes[k].Item2.MaxY) {
+              checkForCollision = true; 
+            }
+          } else {
+            checkForCollision = true; 
+          }
+
+          if (checkForCollision) {
+            Console.WriteLine("Oh wow, it turns out that something might be colliding at t=" + this._time + ". Do not worry. I'll check!:)");
+
+            Body body = bodyBoundingBoxes[i].Item1;
+            ImmovableObject immovableObject = this._immovableObjectBoundingBoxes[k].Item1;
+            Vector2 startDifference = body.Position - immovableObject.Position;
+            Vector2 endDifference = body.NextPosition - immovableObject.Position;
+            bool isColliding = immovableObject.Shape.DoesCollide(body.Shape, startDifference, endDifference, out float timeFactor, out Vector2 collisionNormal);
+            float collisionTime = timeFactor * timeInterval;
+            if (isColliding) {
+              Console.WriteLine("YIKES! Yup, that's a collision 😬");
+              if(collisionTime < lowestCollisionTime) {
+                lowestCollisionTime = collisionTime;
+                lowerCollisionNormal = collisionNormal;
+                collidingBody1 = body;
+                collidingBody2 = null;
+              }
+              /*
+              Collision(ref body1, ref body2);
+              futureState[body1.ID] = (body1.Position, body1.Velocity, body1.Acceleration);
+              futureState[body2.ID] = (body2.Position, body2.Velocity, body2.Acceleration);
+              */
+            } else {
+              Console.WriteLine("Phew!! Thankfully, there were no collision :))");
+            }
+          }
+        }
         
       }
 
       if(lowestCollisionTime != timeInterval) {
         Tick(lowestCollisionTime * 0.98f);
-        Body body1 = collidingBody1;
-        Body body2 = collidingBody2;
-        Collision(body1, body2, lowerCollisionNormal);
+        if (collidingBody2 == null) {
+          CollisionWithImmovableObject(collidingBody1, lowerCollisionNormal);
+        } else {
+          Collision(collidingBody1, collidingBody2, lowerCollisionNormal);
+        }
       } else {
         foreach (Body body in this._bodies) {
           body.Commit();

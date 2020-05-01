@@ -8,7 +8,12 @@ namespace Flounder {
   public struct Line : IShape {
 
     public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float timeFactor, out Vector2 normal) {
-      throw new NotImplementedException("The collision between Rectangle and any other shape is not implemented!");
+      switch(shape) {
+        case Circle circle:
+          return IShape.DoesCollide(this, circle, startPosition, endPosition, out timeFactor, out normal);
+        default:
+          throw new NotImplementedException($"The collision between Line and supplied shape {shape} is not defined.");
+      }
     }
     string IShape.SerializeJSON(int indent, bool singleLine) {
       return IShape.SerializeJSON("line", this.SerializeJSON(indent + 1, singleLine), indent, singleLine);
@@ -36,11 +41,6 @@ namespace Flounder {
 
     public Line(Vector2 semiLength) {
       this.SemiLength = semiLength;
-    }
-
-    public bool DoesCollide(IShape shape, Vector2 startPosition, Vector2 endPosition, out float timeFactor) {
-        timeFactor = 0;
-        return true;
     }
 
     public static Line ParseJSO(dynamic jso) {
