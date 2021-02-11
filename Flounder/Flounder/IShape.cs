@@ -47,7 +47,7 @@ namespace Flounder
       Vector2 spn = startPosition.ToBaseSpace(stationaryLine.SemiLength); // Start position in normal space
       Vector2 epn = endPosition.ToBaseSpace(stationaryLine.SemiLength); // End position in normal space
       float vn = epn.Y - spn.Y; // Velocity along normal axis
-      float t0 = (spn.Y - movingCircle.Radius) / vn;
+      float t0 = (spn.Y - movingCircle.Radius / normal.Length) / vn;
       if (0 <= t0 && t0 <= 1) {
         float m0 = spn.X * (1 - t0) + epn.X * t0;
         if (-1 <= m0 && m0 <= 1) {
@@ -55,9 +55,9 @@ namespace Flounder
             timeFactor = t0;
             normal = new Vector2(-stationaryLine.SemiLength.Y, stationaryLine.SemiLength.X);
           }
-        } 
+        }
       }
-      float t1 = (spn.Y + movingCircle.Radius) / vn;
+      float t1 = (spn.Y + movingCircle.Radius / normal.Length) / vn;
       if (0 <= t1 && t1 <= 1) {
         float m1 = spn.X * (1 - t1) + epn.X * t1;
         if (-1 <= m1 && m1 <= 1) {
@@ -78,7 +78,7 @@ namespace Flounder
         out tempTime,
         out tempNormal
       );
-      if (tempTime < timeFactor) {
+      if (0 <= tempTime && tempTime < timeFactor) {
         timeFactor = tempTime;
         normal = tempNormal;
       }
@@ -90,7 +90,7 @@ namespace Flounder
         out tempTime,
         out tempNormal
       );
-      if (tempTime < timeFactor) {
+      if (0 <= tempTime && tempTime < timeFactor) {
         timeFactor = tempTime;
         normal = tempNormal;
       }

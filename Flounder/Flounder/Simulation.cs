@@ -99,7 +99,7 @@ namespace Flounder
         ImmovableObject immovableObject = ImmovableObject.ParseJSO(immovableObjectJSO);
         this._immovableObjects.Add(immovableObject);
         this._immovableObjectBoundingBoxes.Add(
-          new Tuple<ImmovableObject, BoundingBox>(immovableObject, immovableObject.Shape.OffsetBoundingBox)
+          new Tuple<ImmovableObject, BoundingBox>(immovableObject, immovableObject.Shape.OffsetBoundingBox + immovableObject.Position)
         );
       }
       this._immovableObjectBoundingBoxes.Sort(

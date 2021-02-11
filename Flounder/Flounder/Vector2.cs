@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 namespace Flounder
@@ -27,6 +28,9 @@ namespace Flounder
     }
     public static Vector2 operator /(Vector2 a, float s) {
       return new Vector2(a.X / s, a.Y / s);
+    }
+    public float Length {
+      get { return MathF.Sqrt(this.SquareLength); }
     }
     public float SquareLength {
       get { return this * this; }
